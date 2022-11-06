@@ -59,13 +59,13 @@ ________________________________________________
 <strong>remote                  [Status: 302, Size: 160, Words: 6, Lines: 4, Duration: 641ms]
 </strong>mvc                     [Status: 200, Size: 9902, Words: 754, Lines: 152, Duration: 3917ms]</code></pre>
 
-<figure><img src=".gitbook/assets/image (7).png" alt=""><figcaption><p>Some Kind Store Web App</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (7) (1).png" alt=""><figcaption><p>Some Kind Store Web App</p></figcaption></figure>
 
 <figure><img src=".gitbook/assets/image (6).png" alt=""><figcaption><p>Entering an Apostrophe in the Search Field Confirms That It's Vulnerable to SQL Injection </p></figcaption></figure>
 
 <figure><img src=".gitbook/assets/image (5) (1).png" alt=""><figcaption><p>Confirmed SQL Injection</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/image (3) (2).png" alt=""><figcaption><p>Performing The Injection Using Burp Suite With A Different Payload To Authenticate To A Malicious SMB Service </p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Performing The Injection Using Burp Suite With A Different Payload To Authenticate To A Malicious SMB Service </p></figcaption></figure>
 
 Setting Up Responder To Capture NTLMv2 Hash
 
@@ -307,7 +307,7 @@ Tunnel adapter isatap..htb:
 C:\Users\Administrator\Desktop>
 ```
 
-<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
 
 ## Badge
 
