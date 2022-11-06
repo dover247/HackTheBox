@@ -285,7 +285,7 @@ Ethernet adapter Ethernet0 2:
 PS C:\Users\mssql-svc\desktop>
 ```
 
-<figure><img src="../.gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (3) (1).png" alt=""><figcaption></figcaption></figure>
 
 ## Privilege Escalation
 
@@ -401,4 +401,4 @@ Ethernet adapter Ethernet0 2:
 C:\Users\Administrator\Desktop>
 ```
 
-<figure><img src="../.gitbook/assets/image (2).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../.gitbook/assets/image (2) (1).png" alt=""><figcaption></figcaption></figure>
