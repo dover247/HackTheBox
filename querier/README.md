@@ -355,15 +355,6 @@ C:\Windows\system32>
 ## Root Proof
 
 ```
-C:\Windows\system32>hostname && whoami && type root.txt && ipconfig /all
-hostname && whoami && type root.txt && ipconfig /all
-QUERIER
-nt authority\system
-The system cannot find the file specified.
-
-C:\Windows\system32>cd C:\users\administrator\desktop
-cd C:\users\administrator\desktop
-
 C:\Users\Administrator\Desktop>hostname && whoami && type root.txt && ipconfig /all
 hostname && whoami && type root.txt && ipconfig /all
 QUERIER
