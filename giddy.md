@@ -1,6 +1,6 @@
 # Giddy
 
-### Foothold
+## Foothold
 
 {% code title="Nmap Results" %}
 ```
