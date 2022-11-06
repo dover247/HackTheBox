@@ -1,6 +1,6 @@
 # Querier
 
-## Pre Foothold
+## Foothold
 
 ```
 ┌──[Fri Nov  4 09:23:39 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting/oscp]
