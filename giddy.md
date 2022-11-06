@@ -2,6 +2,7 @@
 
 ### Foothold
 
+{% code title="Nmap Results" overflow="wrap" %}
 ```
 ┌──[Sat Nov  5 08:42:55 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Downloads]
 └──# rscan $ip       
@@ -86,10 +87,11 @@ PORT     STATE SERVICE       REASON          VERSION
 |_http-server-header: Microsoft-HTTPAPI/2.0
 
 ```
+{% endcode %}
 
 <figure><img src=".gitbook/assets/image (6).png" alt=""><figcaption><p>Landing Page. Nothing of Interest.</p></figcaption></figure>
 
-<pre><code>┌──[Sat Nov  5 08:53:37 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Downloads]
+<pre data-overflow="wrap"><code>┌──[Sat Nov  5 08:53:37 PM CDT 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Downloads]
 └──# ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-directories-lowercase.txt -u http://$ip/FUZZ/ -fc 404
 
         /'___\  /'___\           /'___\       
