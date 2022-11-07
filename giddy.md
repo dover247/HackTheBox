@@ -176,7 +176,7 @@ Tunnel adapter isatap..htb:
 *Evil-WinRM* PS C:\Users\Stacy\desktop>
 ```
 
-<figure><img src=".gitbook/assets/image (8).png" alt=""><figcaption><p>user.txt</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (8) (1).png" alt=""><figcaption><p>user.txt</p></figcaption></figure>
 
 ## Privilege Escalation
 
@@ -191,7 +191,7 @@ HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\Ubiquiti 
 
 Searching for **site:exploit-db.com \*Ubiquiti UniFi Video\*** reveals a potential privilege escalation exploit [https://www.exploit-db.com/exploits/43390](https://www.exploit-db.com/exploits/43390)
 
-<figure><img src=".gitbook/assets/image (5).png" alt=""><figcaption><p>Ubiquiti UniFi Video 3.7.3 - Local Privilege Escalation</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (5) (2).png" alt=""><figcaption><p>Ubiquiti UniFi Video 3.7.3 - Local Privilege Escalation</p></figcaption></figure>
 
 According to the exploit is it required to upload a malicious file called **taskkill.exe** to **C:\ProgramData\unifi-video\\**. I check to see if windows defender is running
 
@@ -311,4 +311,4 @@ C:\Users\Administrator\Desktop>
 
 ## Badge
 
-<figure><img src=".gitbook/assets/image.png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
