@@ -4,3 +4,4 @@
 * [Querier](querier/README.md)
 * [Giddy](giddy.md)
 * [Mantis](mantis.md)
+* [Reel](reel.md)
