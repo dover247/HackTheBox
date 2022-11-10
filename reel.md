@@ -45,7 +45,7 @@ The information gathering portion of a penetration test focuses on identifying t
 
 ### Penetration
 
-The penetration testing portions of the assessment focus heavily on gaining access to a variety of systems. During this penetration test, I was able to successfully gain access to _X_ out of the _X_ systems.
+The penetration testing portions of the assessment focus heavily on gaining access to a variety of systems. During this penetration test, I was able to successfully gain access to _all_ systems.
 
 #### System IP: 10.129.15.19
 
@@ -505,7 +505,7 @@ C:\Windows\system32>
 
 **Local.txt Proof Screenshot**
 
-<figure><img src=".gitbook/assets/image (2) (3).png" alt=""><figcaption><p>user proof</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (2).png" alt=""><figcaption><p>user proof</p></figcaption></figure>
 
 **Local.txt Contents**
 
@@ -849,7 +849,7 @@ administrator@REEL C:\Users\Administrator>
 
 **Proof Screenshot Here:**
 
-<figure><img src=".gitbook/assets/image (2).png" alt=""><figcaption><p><strong>Root.txt</strong></p></figcaption></figure>
+<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p><strong>Root.txt</strong></p></figcaption></figure>
 
 **Proof.txt Contents:**
 
@@ -927,4 +927,4 @@ After collecting data from the network was completed, I removed all user account
 
 ### Appendix - Bagde
 
-<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>

@@ -51,7 +51,7 @@ ________________________________________________
 secure_notes            [Status: 200, Size: 477, Words: 41, Lines: 3, Duration: 70ms]
 ```
 
-<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Viewing The secure_notes Directory Reveals Interesting Files. One With An Interesting Name</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (15).png" alt=""><figcaption><p>Viewing The secure_notes Directory Reveals Interesting Files. One With An Interesting Name</p></figcaption></figure>
 
 <figure><img src=".gitbook/assets/image (7).png" alt=""><figcaption><p>The Dev Notes Tells Me That The An SQL User is admin</p></figcaption></figure>
 
