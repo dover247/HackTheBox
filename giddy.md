@@ -65,7 +65,7 @@ ________________________________________________
 
 <figure><img src=".gitbook/assets/image (5) (1).png" alt=""><figcaption><p>Confirmed SQL Injection</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Performing The Injection Using Burp Suite With A Different Payload To Authenticate To A Malicious SMB Service </p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (3) (2).png" alt=""><figcaption><p>Performing The Injection Using Burp Suite With A Different Payload To Authenticate To A Malicious SMB Service </p></figcaption></figure>
 
 Setting Up Responder To Capture NTLMv2 Hash
 

