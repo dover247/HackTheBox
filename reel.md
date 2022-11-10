@@ -849,7 +849,7 @@ administrator@REEL C:\Users\Administrator>
 
 **Proof Screenshot Here:**
 
-<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p><strong>Root.txt</strong></p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption><p><strong>Root.txt</strong></p></figcaption></figure>
 
 **Proof.txt Contents:**
 
@@ -925,6 +925,6 @@ After collecting data from the network was completed, I removed all user account
 | ------------- | -------------------------------- | -------------------------------- |
 | 10.129.47.91  | b38b9329fcdc4ea8887eb109c05c8afd | b2e35251f711471d971e9a660604353d |
 
-### Appendix - Bagde
+### Appendix - Badge
 
 <figure><img src=".gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
