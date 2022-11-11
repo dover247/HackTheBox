@@ -818,14 +818,6 @@ I use sierra's credentials and specify localhost to login and gain access
 
 <figure><img src=".gitbook/assets/image (10).png" alt=""><figcaption><p>Inital Foothold</p></figcaption></figure>
 
-**Vulnerability Explanation:**
-
-**Vulnerability Fix:**
-
-**Severity: Critical**
-
-**Proof of Concept Code Here:**
-
 **Local.txt Proof Screenshot**
 
 <figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
@@ -923,16 +915,6 @@ Impacket v0.9.24 - Copyright 2021 SecureAuth Corporation
 C:\>
 ```
 
-**Vulnerability Exploited:**
-
-**Vulnerability Explanation:**
-
-**Vulnerability Fix:**
-
-**Severity: Critical**
-
-**Exploit Code:**
-
 **root Screenshot Here**
 
 <figure><img src=".gitbook/assets/image (7).png" alt=""><figcaption><p>Root.txt</p></figcaption></figure>
@@ -1010,10 +992,6 @@ After collecting data from the network was completed, I removed all user account
 
 ### Appendix - Proof and Local Contents:
 
-| IP (Hostname) | Local.txt Contents | Proof.txt Contents |
-| ------------- | ------------------ | ------------------ |
-| x.x.x.x       | hash\_here         | hash\_here         |
-
-### Appendix -&#x20;
-
-### Appendix -
+| IP (Hostname)  | Local.txt Contents               | Proof.txt Contents               |
+| -------------- | -------------------------------- | -------------------------------- |
+| 10.129.227.156 | d2fb84163f6279e4cba7cd697bc00992 | e3a4149a6c84118bcc4085fe8facc5b0 |
