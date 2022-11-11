@@ -65,7 +65,7 @@ ________________________________________________
 
 <figure><img src=".gitbook/assets/image (5) (1).png" alt=""><figcaption><p>Confirmed SQL Injection</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Performing The Injection Using Burp Suite With A Different Payload To Authenticate To A Malicious SMB Service </p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (3) (1).png" alt=""><figcaption><p>Performing The Injection Using Burp Suite With A Different Payload To Authenticate To A Malicious SMB Service </p></figcaption></figure>
 
 Setting Up Responder To Capture NTLMv2 Hash
 
@@ -176,7 +176,7 @@ Tunnel adapter isatap..htb:
 *Evil-WinRM* PS C:\Users\Stacy\desktop>
 ```
 
-<figure><img src=".gitbook/assets/image (8) (1).png" alt=""><figcaption><p>user.txt</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (8) (1) (1).png" alt=""><figcaption><p>user.txt</p></figcaption></figure>
 
 ## Privilege Escalation
 
@@ -307,8 +307,8 @@ Tunnel adapter isatap..htb:
 C:\Users\Administrator\Desktop>
 ```
 
-<figure><img src=".gitbook/assets/image (9).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/image (9) (1).png" alt=""><figcaption></figcaption></figure>
 
 ## Badge
 
-<figure><img src=".gitbook/assets/image (1) (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/image (1) (1) (2).png" alt=""><figcaption></figcaption></figure>

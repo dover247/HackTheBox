@@ -21,7 +21,7 @@ PORT      STATE SERVICE      REASON          VERSION
 |_http-title: Tossed Salad - Blog
 ```
 
-<figure><img src=".gitbook/assets/image (8).png" alt=""><figcaption><p>Viewing The Landing Page Appears To Be a Default IIS Server, However, On An Unusual Port</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (8) (1).png" alt=""><figcaption><p>Viewing The Landing Page Appears To Be a Default IIS Server, However, On An Unusual Port</p></figcaption></figure>
 
 ```
 ┌──[Sun Nov  6 05:13:36 PM CST 2022]-[wlan0:192.168.1.153 tun0:10.10.16.2]-[TheScriptKid]-[/home/pentester/Documents/PenetrationTesting]
@@ -51,9 +51,9 @@ ________________________________________________
 secure_notes            [Status: 200, Size: 477, Words: 41, Lines: 3, Duration: 70ms]
 ```
 
-<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Viewing The secure_notes Directory Reveals Interesting Files. One With An Interesting Name</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (16).png" alt=""><figcaption><p>Viewing The secure_notes Directory Reveals Interesting Files. One With An Interesting Name</p></figcaption></figure>
 
-<figure><img src=".gitbook/assets/image (7).png" alt=""><figcaption><p>The Dev Notes Tells Me That The An SQL User is admin</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (7) (3).png" alt=""><figcaption><p>The Dev Notes Tells Me That The An SQL User is admin</p></figcaption></figure>
 
 I Decided To Further Look Into The Dev Notes Filename As It Looks Like A Base64 String.
 
@@ -75,7 +75,7 @@ ASCII/RAW DEcoded :: m$$ql_S@_P@ssW0rd!
 
 Using The Credentials **admin:m\$$ql\_S@\_P@ssW0rd!** I Proceed to connect to mssql service using dbeaver
 
-<figure><img src=".gitbook/assets/image (10).png" alt=""><figcaption><p>Connected To MSSQL</p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (10) (1).png" alt=""><figcaption><p>Connected To MSSQL</p></figcaption></figure>
 
 ## Privilege Escalation
 

